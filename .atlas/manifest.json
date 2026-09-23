@@ -40,13 +40,13 @@
   "section_provenance": {
     ".gitattributes": "ee2483103e4535a08218c30d2d183f93e748055fe4e49383b9b1696c0ab92c41",
     ".gitignore": "51662d61f56fc55514c50fbc54f5990fb61140503f2ea54d143c848559e2e6f8",
-    "CLAUDE.md": "0e00b9330376442affa2c51f7fd2fbfe361a6e1f2b85075992799ff6c390889c",
+    "CLAUDE.md": "2b88e97e0a434a5f44a6e724005a84a77c224438137df29ca71da5b777403aef",
     "README.md": "825f176fb86a5ec73077dbedfffa8a91cd728dc7cdf3f7d7c51055e981da0f48",
     "docs/agents/issue-tracker.md": "06ba12185cf9ccdc9946df68a208ba81e584607ed9c2b6ccb4f39d0c616b4dc0",
     "docs/agents/planning.md": "7afe84231f327db1dbce98e9a31ca9b71b34ffdeba820f964ce49bbbad0a33ca",
-    "docs/agents/testing.md": "584e6a5fc398ff9d51e20fc7d13f73cbedc28c39ff4fbbf9bb5a8f2e35bad41e",
+    "docs/agents/testing.md": "590b410e3bfb9a492082925636046bbe5449606e12a56b55114b073c3661306f",
     "docs/agents/tooling.md": "4b9ae475374ecf056ac28d87b3fe4a01f3ae6b0d51eb4b7d836bed9dffa54705",
-    "docs/atlas-operators-guide.md": "01fdc0d7cb123dbac228ea8a6a4a3844fecf666342049a46541b60d08bc63f0a"
+    "docs/atlas-operators-guide.md": "f45041d429e5436ea58b80ee98d8f658f11912b744da890d44802c4a5e383423"
   },
   "settings_provenance": {
     "hooks": {},

@@ -44,6 +44,15 @@ Used by `/wayfinder`. The **map** is a single issue with **child** issues as tic
 - **Claim**: `gh issue edit <n> --add-assignee @me`, the session's first write.
 - **Resolve**: `gh issue comment <n> --body "<answer>"`, then `gh issue close <n>`, then append a context pointer (gist + link) to the map's Decisions-so-far.
 
+## Request sizes (team policy)
+
+This section is a team edit and takes precedence over the generated lifecycle below for issues labelled `lane:implement` and `size:small`.
+
+- **Small requests** (`lane:implement` + `size:small`, see `docs/agents/triage-labels.md`): the agent implements on a branch, runs the full check set, opens the PR, merges it with `gh pr merge --squash --delete-branch`, and labels the issue `shipped`. No `plan-review`, no human move to `in-progress`, no human merge. The change must be wrapped in the request's flag (ADR 0001); an unflagged change is not small. Rationale: ADR 0002.
+- **Large requests** (`size:large`) and the **consolidation** issue follow the generated lifecycle below unchanged, including every human-only state.
+- **Vote-lane** issues (`lane:vote`) never enter the lifecycle. They are closed when promoted (a new `lane:implement` issue is created and linked) or when the demo ends.
+- One implement-lane request is in flight at a time, oldest first. Others stay in `needs-triage` and are reported as queued.
+
 <!-- atlas-v3:tracker:start -->
 # Issue tracker
 

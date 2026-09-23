@@ -1,0 +1,9 @@
+dist
+node_modules
+package-lock.json
+test-results
+CLAUDE.md
+docs/agents
+docs/atlas-operators-guide.md
+.atlas
+README.md

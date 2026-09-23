@@ -42,6 +42,7 @@ Atlas runs these commands to prove that a change works.
 |---|---|---|---|---|
 | test | `npm test` | Vitest unit tests | During implementation and before PR | verified |
 | lint | `npm run lint` | oxlint over src | Before PR | verified |
+| format | `npm run format` | Prettier over the tree; format:check runs in CI | Before lint; rerun affected tests after automatic fixes | verified |
 | typecheck | `npm run typecheck` | TypeScript project references, no emit | During implementation and before PR | verified |
 | build | `npm run build` | Production Vite build | Before PR | verified |
 | run | `npm run dev` | Local Vite dev server with hot reload | Manual and browser verification | verified |
