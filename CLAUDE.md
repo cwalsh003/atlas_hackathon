@@ -1,6 +1,6 @@
 # atlas_hackathon
 
-Live-mockup client dashboard for the Jahnel Group Atlas hackathon. Spec: `docs/specs/live-mockup-dashboard.md` (tracked as GitHub issue #2). Vocabulary: `CONTEXT.md`. Decisions: `docs/adr/`.
+Live-mockup client dashboard for the Jahnel Group Atlas hackathon. Spec: `docs/specs/live-mockup-dashboard.md` (tracked as GitHub issue #2). Vocabulary: `CONTEXT.md`. Decisions: `docs/adr/`. Plan, ticket map, and skill route: `docs/hackathon.md`.
 
 ## Stack
 
@@ -18,6 +18,8 @@ npm run build        # production build to dist/
 ```
 
 Run typecheck and the affected test file while working; run the full set before opening a PR. CI runs all of them on every PR.
+
+Node 22 comes from fnm. In a non-interactive shell prefix commands with `eval "$(fnm env)"`; the plain `node` on PATH is 16 and cannot run Vite.
 
 ## Conventions
 
