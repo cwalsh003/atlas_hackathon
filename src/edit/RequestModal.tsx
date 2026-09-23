@@ -10,6 +10,11 @@ function regionMarkup(regionId: string): string {
   if (!region) return ''
   const clone = region.cloneNode(true) as Element
   clone.querySelectorAll('[data-demo]').forEach((node) => node.remove())
+  clone.classList.remove('region--edit', 'region--targeted')
+  if (!clone.classList.length) clone.removeAttribute('class')
+  for (const attr of ['role', 'tabindex', 'data-request']) {
+    clone.removeAttribute(attr)
+  }
   return clone.outerHTML
 }
 

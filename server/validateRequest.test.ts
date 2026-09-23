@@ -33,6 +33,13 @@ describe('validateRequest', () => {
     expect(validateRequest({ ...valid, prompt: '' }).ok).toBe(false)
   })
 
+  it('rejects a whitespace-only prompt', () => {
+    expect(validateRequest({ ...valid, prompt: ' \n\t ' })).toEqual({
+      ok: false,
+      error: 'prompt must be 1-500 characters',
+    })
+  })
+
   it('accepts region markup up to 32 KB and rejects anything larger', () => {
     expect(
       validateRequest({ ...valid, markup: 'x'.repeat(32 * 1024) }).ok,
@@ -60,6 +67,15 @@ describe('validateRequest', () => {
     expect(validateRequest({ ...valid, requester: 'a'.repeat(61) }).ok).toBe(
       false,
     )
+  })
+
+  it('rejects a requester containing control characters', () => {
+    for (const requester of ['Colin\nlane: vote', 'bell\u0007', 'del\u007f']) {
+      expect(validateRequest({ ...valid, requester })).toEqual({
+        ok: false,
+        error: 'requester must not contain control characters',
+      })
+    }
   })
 
   it('accepts only the implement and vote lanes', () => {

@@ -30,7 +30,7 @@ export function validateRequest(body: unknown): Validation {
     string,
     unknown
   >
-  if (!isText(prompt, 1, 500)) {
+  if (!isText(prompt, 1, 500) || !prompt.trim()) {
     return { ok: false, error: 'prompt must be 1-500 characters' }
   }
   if (typeof regionId !== 'string' || !REGION_ID.test(regionId)) {
@@ -44,6 +44,10 @@ export function validateRequest(body: unknown): Validation {
   }
   if (!isText(requester, 1, 60)) {
     return { ok: false, error: 'requester must be 1-60 characters' }
+  }
+  // oxlint-disable-next-line no-control-regex
+  if (/[\u0000-\u001f\u007f]/.test(requester)) {
+    return { ok: false, error: 'requester must not contain control characters' }
   }
   if (lane !== 'implement' && lane !== 'vote') {
     return { ok: false, error: 'lane must be implement or vote' }

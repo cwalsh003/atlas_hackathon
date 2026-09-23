@@ -4,23 +4,25 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // gh is the external boundary; capture what the endpoint hands it.
 const gh = vi.hoisted(() => ({
-  calls: [] as { args: string[]; body: string }[],
+  calls: [] as { args: string[]; options: object; body: string }[],
   fail: false,
 }))
 vi.mock('node:child_process', () => ({
   execFile: (
     _cmd: string,
     args: string[],
+    options: object,
     cb: (err: Error | null, stdout: string, stderr: string) => void,
   ) => {
     const body = readFileSync(args[args.indexOf('--body-file') + 1], 'utf8')
-    gh.calls.push({ args, body })
+    gh.calls.push({ args, options, body })
     if (gh.fail) cb(new Error('exit 1'), '', 'HTTP 401: Bad credentials')
     else
       cb(null, 'https://github.com/cwalsh003/atlas_hackathon/issues/42\n', '')
   },
 }))
 
+vi.stubEnv('VITE_DEMO_MODE', '1')
 const { default: requests } = await import('./requests.ts')
 
 const valid = {
@@ -39,12 +41,14 @@ async function send({
   raw,
   headers = {},
   remoteAddress = `10.0.0.${++nextIp}`,
+  next = vi.fn(),
 }: {
   method?: string
   body?: unknown
   raw?: string
   headers?: Record<string, string>
   remoteAddress?: string
+  next?: () => void
 } = {}) {
   const req = Object.assign(Readable.from([raw ?? JSON.stringify(body)]), {
     method,
@@ -63,7 +67,7 @@ async function send({
     },
   }
   // @ts-expect-error - fake req/res are enough for this handler
-  await requests(req, res, vi.fn())
+  await requests(req, res, next)
   return {
     status: res.statusCode,
     json: res.body ? JSON.parse(res.body) : null,
@@ -97,6 +101,11 @@ describe('POST /api/requests', () => {
       '--body-file',
       expect.any(String),
     ])
+  })
+
+  it('gives gh 30 seconds before treating it as hung', async () => {
+    await send()
+    expect(gh.calls[0].options).toEqual({ timeout: 30_000 })
   })
 
   it('writes the body with the source file hint for the region', async () => {
@@ -169,6 +178,16 @@ describe('POST /api/requests', () => {
     expect(
       (await send({ headers: other, remoteAddress: '127.0.0.1' })).status,
     ).toBe(201)
+  })
+
+  it('passes the request on untouched outside demo mode', async () => {
+    vi.stubEnv('VITE_DEMO_MODE', '')
+    const next = vi.fn()
+    const res = await send({ next })
+    vi.stubEnv('VITE_DEMO_MODE', '1')
+    expect(next).toHaveBeenCalledOnce()
+    expect(res.status).toBe(0)
+    expect(gh.calls).toHaveLength(0)
   })
 
   it('responds 502 with the gh error when issue creation fails', async () => {

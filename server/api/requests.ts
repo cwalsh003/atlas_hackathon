@@ -72,14 +72,16 @@ async function sourceFileHint(regionId: string): Promise<string> {
 
 function gh(args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile('gh', args, (error, stdout, stderr) => {
+    execFile('gh', args, { timeout: 30_000 }, (error, stdout, stderr) => {
       if (error) reject(new Error(String(stderr).trim() || error.message))
       else resolve(String(stdout))
     })
   })
 }
 
-const requests: Connect.NextHandleFunction = async (req, res) => {
+const requests: Connect.NextHandleFunction = async (req, res, next) => {
+  // Plain `npm run dev` must not expose issue creation.
+  if (process.env.VITE_DEMO_MODE !== '1') return next()
   if (req.method !== 'POST') {
     res.setHeader('allow', 'POST')
     return send(res, 405, { error: 'method not allowed' })

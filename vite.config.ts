@@ -8,7 +8,8 @@ export default defineConfig({
   plugins: [react(), apiPlugin()],
   test: {
     // Smoke tests hit GitHub; they run only through `npm run smoke`.
-    exclude: [...configDefaults.exclude, 'smoke/**'],
+    // Worktrees under .claude/ carry their own copies of the tests.
+    exclude: [...configDefaults.exclude, 'smoke/**', '.claude/**'],
   },
   server: {
     allowedHosts: ['.trycloudflare.com'],
