@@ -12,6 +12,10 @@ import { isFlagOn } from './isFlagOn.ts'
  * viewer override already resolve `on` for you.
  */
 export function useFlag(id: string): boolean {
-  const { shipped, overrides } = useSyncExternalStore(subscribe, getSnapshot)
+  const { shipped, overrides } = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getSnapshot,
+  )
   return isFlagOn(id, shipped, overrides, isDemoMode)
 }

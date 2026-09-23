@@ -17,9 +17,16 @@ function setState(next: FlagState): void {
   for (const listener of listeners) listener()
 }
 
-/** Replaces the shipped set and notifies subscribers. Also fed by #5's status poll. */
+/** Replaces the shipped set and notifies subscribers; exported so another poll can feed it. */
 export function setShipped(shipped: ReadonlySet<string>): void {
+  if (sameSet(shipped, state.shipped)) return
   setState({ ...state, shipped })
+}
+
+function sameSet(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
+  if (a.size !== b.size) return false
+  for (const id of a) if (!b.has(id)) return false
+  return true
 }
 
 async function pollShipped(): Promise<void> {

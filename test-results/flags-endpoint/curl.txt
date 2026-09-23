@@ -1,21 +1,39 @@
-$ curl -si http://localhost:5175/api/flags   # before labeling issue #16 shipped
+$ gh issue create --label scratch --title 'scratch: flags evidence (orchestrator)' ...  -> #18
+$ curl -si http://localhost:5175/api/flags   # before labelling #18 shipped
 HTTP/1.1 200 OK
 Vary: Origin
 content-type: application/json
-Date: Wed, 23 Sep 2026 21:51:15 GMT
+Date: Wed, 23 Sep 2026 22:00:58 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 Content-Length: 14
 
 {"shipped":[]}
-
-$ curl -si http://localhost:5175/api/flags   # after labeling issue #16 shipped, waited 6s for cache ttl
+before: footer="Built by Jahnel Group"
+$ gh issue edit 18 --add-label shipped
+$ curl -si http://localhost:5175/api/flags   # after labelling, 6 s later
 HTTP/1.1 200 OK
 Vary: Origin
 content-type: application/json
-Date: Wed, 23 Sep 2026 21:51:42 GMT
+Date: Wed, 23 Sep 2026 22:01:10 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 Content-Length: 16
 
-{"shipped":[16]}
+{"shipped":[18]}
+after: footer="Built by Jahnel Group (flag on)"
+$ gh issue edit 18 --remove-label shipped
+$ curl -si http://localhost:5175/api/flags   # after removing the label, 6 s later
+HTTP/1.1 200 OK
+Vary: Origin
+content-type: application/json
+Date: Wed, 23 Sep 2026 22:01:21 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 14
+
+{"shipped":[]}
+removed: footer="Built by Jahnel Group"
+override: footer="Built by Jahnel Group (flag on)"
+$ gh issue close 18 --comment 'evidence run for #4 done'
+✓ Closed issue cwalsh003/atlas_hackathon#18 (scratch: flags evidence (orchestrator))
