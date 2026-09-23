@@ -5,7 +5,7 @@ export function KpiCards() {
   return (
     <div className="kpi-cards">
       <Region id="kpi-orders" className="kpi-card">
-        <span className="kpi-card__label">Orders today</span>
+        <span className="kpi-card__label">Open orders</span>
         <span className="kpi-card__value">{kpis.ordersToday}</span>
       </Region>
       <Region id="kpi-plowing" className="kpi-card">

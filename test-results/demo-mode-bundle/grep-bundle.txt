@@ -1,0 +1,5 @@
+$ grep -c -e VITE_DEMO_MODE -e demoMode dist/assets/*.js
+0
+exit=1
+$ grep -l Abominable dist/assets/*.js
+dist/assets/index-DqWpBVsA.js

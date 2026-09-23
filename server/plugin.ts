@@ -12,14 +12,18 @@ export function apiPlugin(): Plugin {
       const entries = await readdir(apiDir)
 
       for (const entry of entries) {
-        if (entry.endsWith('.test.ts')) continue
+        if (!entry.endsWith('.ts') || entry.endsWith('.test.ts')) continue
 
         const basename = entry.replace(/\.ts$/, '')
         const file = path.join(apiDir, entry)
 
         const handler: Connect.NextHandleFunction = async (req, res, next) => {
-          const mod = await server.ssrLoadModule(file)
-          mod.default(req, res, next)
+          try {
+            const mod = await server.ssrLoadModule(file)
+            await mod.default(req, res, next)
+          } catch (error) {
+            next(error)
+          }
         }
 
         server.middlewares.use(`/api/${basename}`, handler)
