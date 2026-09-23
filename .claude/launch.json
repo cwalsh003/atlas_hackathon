@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "dashboard",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "fnm",
+      "runtimeArgs": ["exec", "--using=22", "npm", "run", "dev"],
       "port": 5173
     }
   ]

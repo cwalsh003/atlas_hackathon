@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server'
 import App from './App'
 
 describe('App', () => {
-  it('renders', () => {
-    expect(renderToString(<App />)).toContain('Vite')
+  it('renders the client dashboard', () => {
+    expect(renderToString(<App />)).toContain('Abominable Snow Services')
   })
 })
