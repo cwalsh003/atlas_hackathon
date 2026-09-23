@@ -4,7 +4,7 @@
     {
       "name": "dashboard",
       "runtimeExecutable": "fnm",
-      "runtimeArgs": ["exec", "--using=22", "npm", "run", "dev"],
+      "runtimeArgs": ["exec", "--using=22", "npm", "run", "dev:demo"],
       "port": 5173
     }
   ]

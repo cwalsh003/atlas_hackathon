@@ -10,9 +10,12 @@ Spec: [docs/specs/live-mockup-dashboard.md](docs/specs/live-mockup-dashboard.md)
 fnm use            # Node 22 from .node-version
 npm install
 npm run dev        # http://localhost:5173
+npm run dev:demo   # same, with demo-only UI (edit mode, vote page) enabled
 ```
 
 Checks: `npm test`, `npm run typecheck`, `npm run lint`, `npm run format`, `npm run build`. CI runs them all on every PR.
+
+To share a running `dev:demo` server over the internet (for a phone or a remote viewer), install `cloudflared` once with `brew install cloudflared`, then run `scripts/tunnel.sh`. It prints a `trycloudflare.com` URL that proxies to your local dev server.
 
 <!-- atlas-v3:readme:start -->
 ## Atlas

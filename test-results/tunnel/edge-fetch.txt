@@ -1,0 +1,18 @@
+$ curl -si https://<quick-tunnel>.trycloudflare.com/  (Cloudflare edge: Newark)
+HTTP/2 200 
+date: Wed, 23 Sep 2026 21:39:54 GMT
+content-type: text/html
+cf-ray: a3fcb4681c4bf795-EWR
+cf-cache-status: DYNAMIC
+cache-control: no-cache
+server: cloudflare
+vary: Origin
+x-robots-tag: none
+x-robots-tag: none
+
+<!doctype html>
+...
+<title>Abominable Snow Services</title>
+
+$ curl -s https://<quick-tunnel>.trycloudflare.com/api/health
+{"ok":true}
