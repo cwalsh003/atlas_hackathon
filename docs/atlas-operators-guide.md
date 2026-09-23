@@ -20,7 +20,7 @@ what Atlas will write on a ticket later, while it does the work.
 | Item | Value |
 |---|---|
 | Workspace name | atlas_hackathon |
-| What this repository is for | Atlas hackathon project |
+| What this repository is for | Live-mockup client dashboard: a React dashboard for a fictional client where an edit mode turns element-level requests into Atlas-delivered changes behind feature flags. |
 | Folder for proof of work | `test-results` |
 
 Atlas may change the repositories below, and nothing else.
@@ -40,13 +40,11 @@ Atlas runs these commands to prove that a change works.
 
 | Check | Command | What it covers | When it runs | Status |
 |---|---|---|---|---|
-| test | `` | None yet | n/a | unavailable |
-| lint | `` | None yet | n/a | unavailable |
-| format | `` | None yet | n/a | unavailable |
-| typecheck | `` | None yet | n/a | unavailable |
-| build | `` | None yet | n/a | unavailable |
-| e2e | `` | None yet | n/a | unavailable |
-| run | `` | None yet | n/a | unavailable |
+| test | `npm test` | Vitest unit tests | During implementation and before PR | verified |
+| lint | `npm run lint` | oxlint over src | Before PR | verified |
+| typecheck | `npm run typecheck` | TypeScript project references, no emit | During implementation and before PR | verified |
+| build | `npm run build` | Production Vite build | Before PR | verified |
+| run | `npm run dev` | Local Vite dev server with hot reload | Manual and browser verification | verified |
 
 `verified` means setup ran the command here and it worked. `inferred` means the
 repository names the command, but setup did not run it. `unavailable` means the

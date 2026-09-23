@@ -32,11 +32,13 @@ repository keeps its own base SHA, branch, verification result, and pull request
 
 ## Repository framing
 
-**atlas_hackathon** — Atlas hackathon project
+**atlas_hackathon** — Live-mockup client dashboard: a React dashboard for a fictional client where an edit mode turns element-level requests into Atlas-delivered changes behind feature flags.
 
 ### Structure
 
-- No stable repository structure has been confirmed.
+- `src/` — Vite React TypeScript application source
+- `src/**/*.test.ts*` — Vitest unit tests beside the code they cover
+- `docs/` — Agent policy and the Atlas operator guide
 
 ### Repository-specific rules
 

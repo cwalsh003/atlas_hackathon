@@ -11,7 +11,7 @@ third-party library documentation.
 
 | Plugin | Status | Why it applies | Use when | Prerequisites | Install or state |
 |---|---|---|---|---|---|
-| `github` | recommended | The repository remote is hosted on GitHub. | Repository, pull-request, issue, and review operations on the source host. | none | `/plugin install github@claude-plugins-official` |
+| `github` | installed | The repository remote is hosted on GitHub. | Repository, pull-request, issue, and review operations on the source host. | none | active |
 
 `installed` means setup verified the plugin is enabled and any named binary is
 available. `recommended` means the repository signals match but installation
