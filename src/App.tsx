@@ -1,8 +1,21 @@
+import { Footer } from './dashboard/Footer'
+import { Header } from './dashboard/Header'
+import { KpiCards } from './dashboard/KpiCards'
+import { OrdersChart } from './dashboard/OrdersChart'
+import { WorkOrdersTable } from './dashboard/WorkOrdersTable'
+import { YetiRoster } from './dashboard/YetiRoster'
+
 export default function App() {
   return (
-    <main style={{ padding: 24, fontFamily: 'system-ui' }}>
-      <h1>Abominable Snow Services</h1>
-      <p>Dispatch dashboard. Built by Jahnel Group.</p>
-    </main>
+    <div className="dashboard">
+      <Header />
+      <KpiCards />
+      <div className="dashboard__split">
+        <OrdersChart />
+        <YetiRoster />
+      </div>
+      <WorkOrdersTable />
+      <Footer />
+    </div>
   )
 }

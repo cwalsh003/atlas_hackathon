@@ -1,4 +1,4 @@
-/* Minimal reset. Variant styles live in prototype/prototype.css for now. */
+/* Minimal reset. */
 *,
 *::before,
 *::after {
@@ -10,10 +10,205 @@ html {
 }
 body {
   margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f4f6f8;
+  color: #1a1f24;
 }
 button,
 input,
 select,
 textarea {
   font: inherit;
+}
+
+/* Ops board */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 24px 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.dashboard > * {
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  background: #0f2b3d;
+  color: #fff;
+  border-radius: 8px;
+}
+
+.header__brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.header__nav {
+  display: flex;
+  gap: 16px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.header__date {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.kpi-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.kpi-card__label {
+  font-size: 0.8rem;
+  color: #5b6572;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.kpi-card__value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.dashboard__split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.chart,
+.roster {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.chart__title,
+.roster__title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+.chart__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chart__bar-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 32px;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart__bar-label {
+  font-size: 0.85rem;
+  color: #5b6572;
+}
+
+.chart__bar {
+  height: 10px;
+  background: #2f7dbd;
+  border-radius: 6px;
+  min-width: 4px;
+}
+
+.chart__bar-count {
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.roster__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.roster__item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  padding: 6px 0;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.orders {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.orders__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.orders__table th,
+.orders__table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.orders__table th {
+  color: #5b6572;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #5b6572;
+  padding: 12px 0;
+}
+
+@media (max-width: 720px) {
+  .kpi-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard__split {
+    grid-template-columns: 1fr;
+  }
+
+  .kpi-cards > *,
+  .dashboard__split > * {
+    min-width: 0;
+  }
+
+  .orders {
+    overflow-x: auto;
+    min-width: 0;
+  }
 }
