@@ -2,7 +2,7 @@
 
 A client dashboard for a fictional customer, Abominable Snow Services, built for the Jahnel Group Atlas hackathon. In demo mode, every region of the dashboard gets a pen: a viewer describes a change, Atlas turns it into a GitHub issue, triages it, and ships small changes behind a per-request feature flag while the room watches.
 
-Spec: [docs/specs/live-mockup-dashboard.md](docs/specs/live-mockup-dashboard.md). Vocabulary: [CONTEXT.md](CONTEXT.md). Decisions: [docs/adr/](docs/adr/).
+Spec: [docs/specs/live-mockup-dashboard.md](docs/specs/live-mockup-dashboard.md). Vocabulary: [CONTEXT.md](CONTEXT.md). Decisions: [docs/adr/](docs/adr/). Hackathon plan and ticket map: [docs/hackathon.md](docs/hackathon.md).
 
 ## Run it
 
