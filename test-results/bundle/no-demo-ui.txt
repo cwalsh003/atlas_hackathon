@@ -1,0 +1,14 @@
+# AC1: production build (no VITE_DEMO_MODE) contains no demo-only UI
+# npm run build; grep -c <string> dist/assets/*.js (count of matching lines, expect 0)
+dist/assets/index-BExy4-Gq.js
+Edit mode            0
+Build it             0
+Put it to a vote     0
+Tap any region       0
+Request a change     0
+asd.requester        0
+/api/requests        0
+data-demo            0
+hint-banner          0
+edit-toggle          0
+region--edit         0

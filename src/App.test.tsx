@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderToString } from 'react-dom/server'
 import App from './App'
 
@@ -30,5 +30,29 @@ describe('App', () => {
     for (const id of editIds) {
       expect(html).toContain(`data-edit-id="${id}"`)
     }
+  })
+})
+
+describe('App edit mode', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  async function renderApp(demoMode: string | undefined) {
+    vi.stubEnv('VITE_DEMO_MODE', demoMode)
+    vi.resetModules()
+    const { default: FreshApp } = await import('./App')
+    return renderToString(<FreshApp />)
+  }
+
+  it('shows the edit mode toggle, switched off, in demo mode', async () => {
+    const html = await renderApp('1')
+    expect(html).toMatch(/<button[^>]*aria-pressed="false"[^>]*>Edit mode</)
+  })
+
+  it('renders no demo-only UI outside demo mode', async () => {
+    const html = await renderApp(undefined)
+    expect(html).not.toContain('Edit mode')
+    expect(html).not.toContain('data-demo')
   })
 })
