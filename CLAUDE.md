@@ -1,6 +1,31 @@
-# hack_atlas
+# atlas_hackathon
 
-Empty so far. Add build/test commands and conventions here as the project takes shape.
+Live-mockup client dashboard for the Jahnel Group Atlas hackathon. Spec: `docs/specs/live-mockup-dashboard.md` (tracked as GitHub issue #2). Vocabulary: `CONTEXT.md`. Decisions: `docs/adr/`.
+
+## Stack
+
+Vite, React 19, TypeScript, Vitest, oxlint, Prettier. Node 22 via `.node-version` (fnm). No backend beyond Vite dev-server middleware.
+
+## Commands
+
+```bash
+npm run dev          # Vite dev server on http://localhost:5173
+npm test             # Vitest, single run
+npm run typecheck    # tsc -b --noEmit
+npm run lint         # oxlint
+npm run format       # prettier --write
+npm run build        # production build to dist/
+```
+
+Run typecheck and the affected test file while working; run the full set before opening a PR. CI runs all of them on every PR.
+
+## Conventions
+
+- Use the terms in `CONTEXT.md` in code, tests, issues, and comments. A dashboard *region* is not a React component; say "React component" when you mean one.
+- Every agent-made change for a request is wrapped in `useFlag('req-<issue>')`. Never add a flags registry file (ADR 0001).
+- Tests live beside the code they cover as `*.test.ts(x)` and test behavior through public interfaces.
+- Demo-only UI (edit mode, pens, status pills, vote page) renders only when the demo-mode env var is set. Production builds must contain none of it.
+- Prefer the standard library and existing dependencies. Add a dependency only when a few lines cannot do the job.
 
 ## Agent skills
 
@@ -10,7 +35,7 @@ Issues are tracked in GitHub Issues via the `gh` CLI. See `docs/agents/issue-tra
 
 ### Triage labels
 
-Default labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+Default labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. Request labels: `lane:implement`, `lane:vote`, `size:small`, `size:large`, `shipped`. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
@@ -32,11 +57,14 @@ repository keeps its own base SHA, branch, verification result, and pull request
 
 ## Repository framing
 
-**atlas_hackathon** — Atlas hackathon project
+**atlas_hackathon** — Live-mockup client dashboard: a React dashboard for a fictional client where an edit mode turns element-level requests into Atlas-delivered changes behind feature flags.
 
 ### Structure
 
-- No stable repository structure has been confirmed.
+- `src/` — Vite React TypeScript application source
+- `src/**/*.test.ts*` — Vitest unit tests beside the code they cover
+- `docs/` — Agent policy and the Atlas operator guide
+- `.github/workflows/ci.yml` — CI: format check, lint, typecheck, test, build on every PR
 
 ### Repository-specific rules
 

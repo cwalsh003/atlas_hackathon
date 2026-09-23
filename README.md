@@ -1,6 +1,18 @@
-# atlas_hackathon
+# Live mockup dashboard
 
-Atlas hackathon project.
+A client dashboard for a fictional customer, Abominable Snow Services, built for the Jahnel Group Atlas hackathon. In demo mode, every region of the dashboard gets a pen: a viewer describes a change, Atlas turns it into a GitHub issue, triages it, and ships small changes behind a per-request feature flag while the room watches.
+
+Spec: [docs/specs/live-mockup-dashboard.md](docs/specs/live-mockup-dashboard.md). Vocabulary: [CONTEXT.md](CONTEXT.md). Decisions: [docs/adr/](docs/adr/).
+
+## Run it
+
+```bash
+fnm use            # Node 22 from .node-version
+npm install
+npm run dev        # http://localhost:5173
+```
+
+Checks: `npm test`, `npm run typecheck`, `npm run lint`, `npm run format`, `npm run build`. CI runs them all on every PR.
 
 <!-- atlas-v3:readme:start -->
 ## Atlas

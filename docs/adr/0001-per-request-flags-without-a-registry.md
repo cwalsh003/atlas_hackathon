@@ -1,0 +1,3 @@
+# Per-request flags with no registry file
+
+Every code change an agent makes for a request is wrapped in a flag named after the request's issue, such as `req-42`, and there is no file that lists the flags. The enabled set is derived from issue labels by the server and from the viewer's local overrides. We chose this over a flags file because a registry that every PR appends to would conflict on every concurrent merge, and over no flags at all because unflagged changes cannot be shown to one viewer, hidden from another, or dropped without a revert. The cost is that a flag id has no compile-time existence check, so a typo in a flag name silently reads false.
