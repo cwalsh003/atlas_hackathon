@@ -66,7 +66,7 @@ While work happens, the region shows a status pill that walks through triage, bu
 
 ## Implementation Decisions
 
-- **Stack**: Vite, React, TypeScript, one chart library, mock data as a JSON module. No backend beyond Vite middleware.
+- **Stack**: Vite, React, TypeScript, chart as CSS or inline SVG (no chart library), mock data as a JSON module. No backend beyond Vite middleware.
 - **Fictional client**: Abominable Snow Services. Work orders are driveways, technicians are yetis, statuses are scheduled, plowing, done, buried. Client branding on the app, "Built by Jahnel Group" in the footer.
 - **Regions**: about ten marked areas, each rendered by a named React component with a stable `data-edit-id`. Agents edit the React component that owns the region id; new ids are added only when a request creates a new region.
 - **Demo mode**: a build-time env var, off by default. It controls the edit toggle, pens, prompt modal, status pills, the vote page route, and flag overrides. Nothing demo-only renders when it is off, and the flag hook returns false unconditionally in that build.
@@ -74,7 +74,7 @@ While work happens, the region shows a status pill that walks through triage, bu
 - **Flag defaults**: implement-lane flags turn on for everyone once the issue is labeled shipped. Vote-lane overrides are off by default and toggleable per viewer. Production build: all off.
 - **Server endpoints** (Vite middleware, one process):
   - create request: takes prompt, region id, region markup, requester name, lane; creates a GitHub issue with the `needs-triage` label plus a lane label; returns the issue number.
-  - request status: proxies issue labels and state for a list of issue numbers, cached for five seconds, so the room does not exhaust the unauthenticated GitHub rate limit.
+  - request status: proxies issue labels and state for a list of issue numbers, cached for five seconds, so a room of viewers costs one authenticated `gh` call per five seconds.
   - flags: returns the set of issue numbers labeled shipped.
   - votes: reads and appends votes stored in a JSON file on the laptop; promote creates the implement-lane issue.
   - All GitHub writes and reads go through the `gh` CLI already authenticated on the laptop. No token lives in the browser.

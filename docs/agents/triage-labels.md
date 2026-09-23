@@ -25,5 +25,6 @@ Added for the live-mockup dashboard. A request is a GitHub issue created from th
 | `size:small` | Triage judged the implement-lane request small: one region, no new data fields, no new dependency. Ships without a human click (ADR 0002). |
 | `size:large` | Everything else in the implement lane. Follows the standard Atlas route. |
 | `shipped` | The change is merged behind its flag. In demo mode every viewer sees it. |
+| `scratch` | Smoke-test or manual-evidence issue. The agent loop ignores it. |
 
 Triage applies exactly one `size:*` label to every `lane:implement` issue. A request that cannot be understood gets `needs-info`; one outside the dashboard gets `wontfix`; both get a comment saying why.

@@ -27,7 +27,7 @@ The point of the hackathon is to route the work through the Atlas and Matt Pococ
 | 9    | `/code-review main`               | on the first PR                                                                                  |
 | 10   | `/atlas-improve`                  | after the first implement run, for cost and waste evidence                                       |
 
-Demo loop on Thursday is `/triage` plus `/atlas-implement`, driven by the loop in ticket #6. Wrap-up skills: `/handoff` between sessions, `/retro` after.
+Demo loop on Thursday is the ticket #6 loop: its own labels-only triage (the interactive `/triage` skill stalls unattended), then `/atlas-implement`. Wrap-up skills: `/handoff` between sessions, `/retro` after.
 
 Skills that do not fit this repo: the Atlas `design-*` and `deliver-*` families, `atlas-ingest`, the KB skills, `atlas-pursuit-new`, `atlas-heartbeat` (they need a planning repo or an engagement workspace), and `/wayfinder`.
 
