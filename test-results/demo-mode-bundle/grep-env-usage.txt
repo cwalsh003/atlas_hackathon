@@ -1,9 +1,0 @@
-$ grep -rn VITE_DEMO_MODE src server package.json
-src/demoMode.test.ts:8:  it('is true when VITE_DEMO_MODE is "1"', async () => {
-src/demoMode.test.ts:9:    vi.stubEnv('VITE_DEMO_MODE', '1')
-src/demoMode.test.ts:15:  it('is false when VITE_DEMO_MODE is unset', async () => {
-src/demoMode.test.ts:16:    vi.stubEnv('VITE_DEMO_MODE', undefined)
-src/demoMode.test.ts:22:  it('is false when VITE_DEMO_MODE is "0"', async () => {
-src/demoMode.test.ts:23:    vi.stubEnv('VITE_DEMO_MODE', '0')
-package.json:8:    "dev:demo": "VITE_DEMO_MODE=1 vite",
-src/demoMode.ts:1:export const isDemoMode = import.meta.env.VITE_DEMO_MODE === '1'

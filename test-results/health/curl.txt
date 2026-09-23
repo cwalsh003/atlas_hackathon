@@ -1,9 +1,0 @@
-HTTP/1.1 200 OK
-Vary: Origin
-content-type: application/json
-Date: Wed, 23 Sep 2026 21:20:16 GMT
-Connection: keep-alive
-Keep-Alive: timeout=5
-Content-Length: 11
-
-{"ok":true}

@@ -1,0 +1,21 @@
+$ curl -si http://localhost:5175/api/flags   # before labeling issue #16 shipped
+HTTP/1.1 200 OK
+Vary: Origin
+content-type: application/json
+Date: Wed, 23 Sep 2026 21:51:15 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 14
+
+{"shipped":[]}
+
+$ curl -si http://localhost:5175/api/flags   # after labeling issue #16 shipped, waited 6s for cache ttl
+HTTP/1.1 200 OK
+Vary: Origin
+content-type: application/json
+Date: Wed, 23 Sep 2026 21:51:42 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 16
+
+{"shipped":[16]}

@@ -1,0 +1,2 @@
+$ grep -c -e asd.flagOverrides -e unflag dist/assets/*.js
+0
