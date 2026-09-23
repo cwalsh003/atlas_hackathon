@@ -26,6 +26,7 @@ While work happens, the region shows a status pill that walks through triage, bu
 - **Lane**: `implement` or `vote`, chosen by the requester. Triage assigns an implement-lane request a **size**: `small` ships without a human click, `large` stops at plan review.
 - **Proposal**: a request in the vote lane.
 - **Flag**: a per-issue switch named after the issue, such as `req-42`, wrapping every agent-made change.
+- **Edit-mode UI** (settled by the `prototype/edit-mode-ui` branch, variant A with C's tap behavior): the dashboard is a classic ops board: header with brand and nav, four KPI cards in a row, the orders-per-yeti chart beside the yeti roster, the full work-orders table, and a footer. On screens wider than a phone, edit mode shows a pen in the top-right corner of every region, including each table column header. On phone widths there are no pens: the whole region is the tap target and a hint banner under the header says so. The pen or tap opens a centered modal with the prompt, the requester's name, and two large lane buttons ("Build it", "Put it to a vote") each with a one-line explanation. The status pill sits in the region's top-right corner next to the pen and links to the issue.
 - **Demo mode**: build-time env var that enables edit mode, the vote page, and flag overrides.
 - **Shipped**: the state, and issue label, of a request whose change is merged behind its flag; in demo mode every viewer sees it.
 - **Consolidation**: the closing issue and PR that remove flags for kept changes and delete code for dropped ones.
