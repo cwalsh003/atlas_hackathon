@@ -7,16 +7,20 @@ describe('isFlagOn', () => {
   })
 
   it('is true when the id is in the shipped set', () => {
-    expect(isFlagOn('req-42', new Set(['req-42']), new Set(), true)).toBe(true)
+    expect(isFlagOn('req-100', new Set(['req-100']), new Set(), true)).toBe(
+      true,
+    )
   })
 
   it('is true when only an override is on', () => {
-    expect(isFlagOn('req-42', new Set(), new Set(['req-42']), true)).toBe(true)
+    expect(isFlagOn('req-100', new Set(), new Set(['req-100']), true)).toBe(
+      true,
+    )
   })
 
   it('is false in a production build regardless of the shipped set or an override', () => {
     expect(
-      isFlagOn('req-42', new Set(['req-42']), new Set(['req-42']), false),
+      isFlagOn('req-100', new Set(['req-100']), new Set(['req-100']), false),
     ).toBe(false)
   })
 })

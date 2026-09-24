@@ -27,21 +27,21 @@ describe('readOverrides', () => {
   })
 
   it('adds ids from repeated ?flag= params', () => {
-    stubWindow('?flag=req-42&flag=req-7')
-    expect(readOverrides()).toEqual(new Set(['req-42', 'req-7']))
+    stubWindow('?flag=req-100&flag=req-7')
+    expect(readOverrides()).toEqual(new Set(['req-100', 'req-7']))
   })
 
   it('removes ids from repeated ?unflag= params, even when previously stored', () => {
-    stubWindow('?unflag=req-42', {
-      'asd.flagOverrides': JSON.stringify(['req-42', 'req-7']),
+    stubWindow('?unflag=req-100', {
+      'asd.flagOverrides': JSON.stringify(['req-100', 'req-7']),
     })
     expect(readOverrides()).toEqual(new Set(['req-7']))
   })
 
   it('persists the resulting set to localStorage', () => {
-    const store = stubWindow('?flag=req-42')
+    const store = stubWindow('?flag=req-100')
     readOverrides()
-    expect(store.get('asd.flagOverrides')).toBe(JSON.stringify(['req-42']))
+    expect(store.get('asd.flagOverrides')).toBe(JSON.stringify(['req-100']))
   })
 
   it('returns an empty set outside the browser (no window)', () => {

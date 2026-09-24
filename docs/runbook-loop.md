@@ -169,6 +169,21 @@ Your moves:
 - The requester clarified in a comment and you want the loop to try again: `gh issue edit <n> --remove-label needs-info`. Triage sizes it on the next cycle.
 - Leave it declined: nothing to do. Close it when the demo ends.
 
+## Consolidation
+
+The closing step (#9): the flagged experiments become permanent code through one human-reviewed PR. Open one consolidation issue with this body, then run `/atlas-implement <issue>` from a normal session (not the loop):
+
+```
+## Consolidation
+
+Keep: #<n>, #<n>   (remove the flag wrapper; the change becomes unconditional)
+Drop: #<n>, #<n>   (delete the change; the region renders as before)
+```
+
+Rules: every request in the shipped set appears in exactly one list; a kept request's `useFlag('req-<n>')` call and its off-branch are removed; a dropped request's on-branch and any test that only exercised its flag are removed; afterwards `grep -rn "useFlag('req-" src` finds only the how-to note in `src/flags/useFlag.ts`. `src/flags/` itself stays so new requests can ship behind flags. The PR stops at `human-review`; a human merges it. Comment `[CLOSEOUT]` on each request issue naming its fate; closing the issues is the human's call.
+
+Done on 2026-09-24: kept #49; dropped #42, #44, #45, #51.
+
 ## Measured cycle times
 
 Measured on 2026-09-24 with `LOOP_INTERVAL=20` and `IMPLEMENT_MODE=atlas` (raw numbers: `test-results/runbook/measured-times.txt`, runs: `test-results/e2e/timeline.txt`). Run 2 includes the CI wait and a second request filed while the first was implementing.
