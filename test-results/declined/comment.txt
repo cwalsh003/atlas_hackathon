@@ -1,0 +1,26 @@
+# Declined request #50: filed through the modal (region kpi-orders, prompt "make it Tuesday", requester "Atlas declined evidence") while #49 sat at plan-review
+# Captured 2026-09-24T15:32:07Z
+
+#50 kpi-orders: make it Tuesday
+state=OPEN created=2026-09-24T15:25:29Z
+labels=needs-triage,needs-info,lane:implement
+
+## #49 labels at the moment #50 was declined: plan-review (set 11:25:16; #50 filed 11:25:29, declined 11:25:42)
+
+## Loop log
+2026-09-24T11:25:42 triage #50 needs-info: It isn't clear what "make it Tuesday" should change on the Open orders card, so please say whether you want new label text, a filter to Tuesday's orders, or something else. 
+
+## Timeline events
+2026-09-24T15:25:30Z labeled needs-triage
+2026-09-24T15:25:30Z labeled lane:implement
+2026-09-24T15:25:41Z labeled needs-info
+2026-09-24T15:25:42Z commented 
+
+## [TRIAGE] comment
+cwalsh003 2026-09-24T15:25:42Z
+[TRIAGE] It isn't clear what "make it Tuesday" should change on the Open orders card, so please say whether you want new label text, a filter to Tuesday's orders, or something else. 
+
+filed 15:25:29Z (modal) -> needs-info + [TRIAGE] at 11:25:42 local: 13 s, within one 20 s cycle
+
+## Pill screenshot: test-results/declined/pill.png, 375 px phone, pill tapped to show the comment (captured 2026-09-24T19:09:28Z, after PR #53 restored the pill)
+{"number":50,"regionId":"kpi-orders","state":"declined","url":"https://github.com/cwalsh003/atlas_hackathon/issues/50","assigned":false,"comment":"[TRIAGE] It isn't clear what \"make it Tuesday\" should change on the Open orders card, so please say whether you want new label text, a filter to Tuesday's orders, or something else. "}

@@ -1,0 +1,50 @@
+# #49 PR opening after the human approval (in-progress), captured 2026-09-24T19:17:06Z
+# Worktree req/49 recreated from origin/main df4406f (after PR #53)
+
+labels=needs-triage,ready-for-agent,human-review,lane:implement,size:large
+assignees=cwalsh003
+PR #54 OPEN req/49->main author=cwalsh003 created=2026-09-24T19:15:34Z
+https://github.com/cwalsh003/atlas_hackathon/pull/54
+files=src/dashboard/WorkOrdersTable.test.tsx,src/dashboard/WorkOrdersTable.tsx,src/dashboard/YetiRoster.test.tsx,src/dashboard/YetiRoster.tsx
+body first lines:
+Refs #49
+
+When `useFlag('req-49')` is on, the work-orders `col-yeti` column header reads **Crew** and the roster title reads **Crew roster**. With the flag off, both render `Yeti` and `Yeti roster` as before. The region ids, the `YetiRoster` React component name, and the yeti data are unchanged.
+
+## Changes
+- `src/dashboard/WorkOrdersTable.tsx`, `src/dashboard/YetiRoster.tsx`: the label now switches on the flag.
+- `src/dashboard/WorkOrdersTable.test.tsx`, `src/dashboard/YetiRoster.test.tsx` (new): each file tests the label with the flag off and with it on.
+
+
+## gh pr checks 54
+checks	pass	22s	https://github.com/cwalsh003/atlas_hackathon/actions/runs/36046925842/job/107792647990	
+
+## Status endpoint
+{"number":49,"regionId":"orders","state":"pr-open","url":"https://github.com/cwalsh003/atlas_hackathon/issues/49","assigned":true}
+
+## Loop log (this run)
+2026-09-24T11:32:16 loop stopped
+2026-09-24T15:09:33 loop start: served=/Users/cwalsh/hack_atlas mode=atlas interval=20s as cwalsh003
+2026-09-24T15:09:37 #49 plan approved: implement
+2026-09-24T15:09:39 #49 worktree /Users/cwalsh/hack_atlas/.claude/worktrees/req-49/atlas_hackathon; npm ci
+2026-09-24T15:09:41 #49 implement the approved plan (output in /Users/cwalsh/hack_atlas/.claude/worktrees/8/atlas_hackathon/.claude/loop-req-49.log)
+2026-09-24T15:16:42 #49 PR #54 opened
+2026-09-24T15:16:43 #49 human-review: PR #54 waits for the human merge (gh pr merge 54 --squash --delete-branch)
+2026-09-24T15:16:57 loop stopped
+
+## Implement run (.claude/loop-req-49.log)
+subtype=success is_error=false duration_ms=107011 num_turns=15 total_cost_usd=5.10329165
+
+## Timeline events since approval
+2026-09-24T19:08:42Z unlabeled plan-review
+2026-09-24T19:08:42Z labeled in-progress
+2026-09-24T19:09:37Z locked 
+2026-09-24T19:12:52Z commented 
+2026-09-24T19:15:08Z unlabeled in-progress
+2026-09-24T19:15:08Z labeled ai-review
+2026-09-24T19:15:19Z commented 
+2026-09-24T19:16:30Z commented 
+2026-09-24T19:16:34Z labeled human-review
+2026-09-24T19:16:34Z unlabeled ai-review
+
+filed 15:19:49Z; approved (in-progress) by the human before 19:09Z; loop start 15:09:33 local -> implement started 15:09:41 -> PR #54 created 19:15:34Z = 15:15:34 local (353 s), run exited and loop saw it 15:16:42 (421 s) -> human-review 15:16:43

@@ -1,0 +1,32 @@
+# #49 shipped after the human merge of PR #54, captured 2026-09-24T19:22:52Z
+
+state=OPEN labels=needs-triage,ready-for-agent,human-review,lane:implement,size:large,shipped
+PR #54 MERGED mergedAt=2026-09-24T19:21:29Z mergeCommit=5918374
+served checkout: 5918374 Rename the Yeti column to Crew in the work-orders table and the roster behind req-49 (#49) (#54)
+req-49 worktree: ls: /Users/cwalsh/hack_atlas/.claude/worktrees/req-49: No such file or directory
+
+## Loop log
+2026-09-24T15:22:14 loop start: served=/Users/cwalsh/hack_atlas mode=atlas interval=20s as cwalsh003
+2026-09-24T15:22:26 #49 shipped (large route): PR #54 merged, served checkout pulled, filed-to-shipped 14558s
+2026-09-24T15:22:39 loop stopped
+
+## Timeline events since merge
+2026-09-24T19:22:22Z labeled shipped
+2026-09-24T19:22:24Z unlocked 
+2026-09-24T19:22:25Z commented 
+
+## [PROGRESS] comment
+cwalsh003 2026-09-24T19:22:25Z
+[PROGRESS] Shipped by the loop after the human merge of PR #54.
+
+## Status endpoint
+{"number":49,"regionId":"orders","state":"shipped","url":"https://github.com/cwalsh003/atlas_hackathon/issues/49","assigned":true}
+
+## No-reload check (one page load, open before shipped; before.png / after.png)
+2026-09-24T19:22:00.198Z before: "YETI\n✎" "Yeti roster"
+2026-09-24T19:22:32.319Z after: "CREW\n✎" "Crew roster" pill: shipped page loads: 1
+pill after next poll: shipped
+
+## Measured
+PR #54 merged 15:21:29 local while the loop was stopped (gate 2). The served checkout was already at 5918374 before the loop started (checked 19:22:00Z), so the loop's pull was a no-op; the change still stayed hidden until shipped turned the req-49 flag on.
+loop started 15:22:14 -> shipped 15:22:26 (12 s, first cycle) -> dashboard showed Crew/Crew roster and the shipped pill at 15:22:32 (6 s later, next status poll, no reload). Merge to shipped 57 s wall-clock, of which 45 s the loop was not running.
