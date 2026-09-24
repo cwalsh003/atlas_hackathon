@@ -1,0 +1,6 @@
+# Built with a temporary consumer: Footer wrapped in useFlag('req-<scratch>') (wrapper removed before commit)
+$ npm run build; grep -c -e asd.flagOverrides -e unflag -e api/flags dist/assets/*.js   # production, expect 0
+0
+exit=1
+$ VITE_DEMO_MODE=1 vite build; same grep on the demo bundle   # expect > 0
+1
