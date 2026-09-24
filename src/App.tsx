@@ -6,7 +6,6 @@ import { WorkOrdersTable } from './dashboard/WorkOrdersTable'
 import { YetiRoster } from './dashboard/YetiRoster'
 import { isDemoMode } from './demoMode'
 import { EditModeProvider, useEditMode } from './edit/EditModeContext'
-import { VotePage } from './vote/VotePage'
 
 function HintBanner() {
   const { enabled, isPhone } = useEditMode()
@@ -37,11 +36,7 @@ function Dashboard() {
 export default function App() {
   return isDemoMode ? (
     <EditModeProvider>
-      {typeof window !== 'undefined' && window.location.pathname === '/vote' ? (
-        <VotePage />
-      ) : (
-        <Dashboard />
-      )}
+      <Dashboard />
     </EditModeProvider>
   ) : (
     <Dashboard />

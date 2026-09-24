@@ -1,0 +1,25 @@
+# AC5 merge-gate dry run: issue #37, PR #39 (2026-09-24T14:22:21Z)
+$ SERVED_CHECKOUT=/Users/cwalsh/hack_atlas scripts/loop.sh --gate 37 39
+2026-09-24T10:22:24 #37 gate PR #39 exit 1: {"pr":39,"issue":37,"pass":false,"reasons":["src/dashboard/Footer.tsx: missing useFlag('req-37')"]}
+✓ Closed pull request cwalsh003/atlas_hackathon#39 (Gate dry run: unflagged Footer edit (#37))
+! Skipped deleting the local branch since current directory is not a git repository
+✓ Deleted branch req/37
+2026-09-24T10:22:29 #37 refused: PR #39 closed, relabelled size:large: src/dashboard/Footer.tsx: missing useFlag('req-37')
+exit=0
+
+$ gh pr view 39 --json url,state,headRefName,files,comments
+{"comments":["Merge gate refused this PR for #37: src/dashboard/Footer.tsx: missing useFlag('req-37')"],"files":["src/dashboard/Footer.tsx"],"headRefName":"req/37","state":"CLOSED","url":"https://github.com/cwalsh003/atlas_hackathon/pull/39"}
+
+$ gh issue view 37 --json url,labels,assignees
+{"assignees":[],"labels":["ready-for-agent","lane:implement","size:large","scratch"],"url":"https://github.com/cwalsh003/atlas_hackathon/issues/37"}
+
+$ gh issue view 37 --comments (last comment)
+[TRIAGE] loop: the merge gate refused PR #39 (src/dashboard/Footer.tsx: missing useFlag('req-37')), so this request is not small. Relabelled `size:large` + `ready-for-agent` for the standard Atlas route.
+
+$ git ls-remote origin refs/heads/req/37   (empty = remote branch deleted)
+$ git branch --list req/37   (empty = local branch deleted)
+
+# Re-check with the review-fixed gate (read-only CLI, 2026-09-24T15:02:12Z)
+$ node scripts/mergeGate.ts 39 37
+{"pr":39,"issue":37,"sha":"2f50feae02d47e92a453a56ba753bdffa10b0362","pass":false,"reasons":["src/dashboard/Footer.tsx: missing useFlag('req-37')"]}
+exit=1

@@ -27,11 +27,6 @@ export function Header() {
         <span>Dispatch</span>
         <span>Yetis</span>
         <span>Reports</span>
-        {isDemoMode && (
-          <a data-demo className="header__vote" href="/vote">
-            Vote
-          </a>
-        )}
       </nav>
       <span className="header__date">{today}</span>
       {isDemoMode && <EditToggle />}

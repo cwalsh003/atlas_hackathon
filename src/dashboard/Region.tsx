@@ -2,8 +2,6 @@ import { useState, type KeyboardEvent, type ReactNode } from 'react'
 import { isDemoMode } from '../demoMode'
 import { useEditMode } from '../edit/EditModeContext'
 import { RequestModal } from '../edit/RequestModal'
-import { StatusPill } from '../status/StatusPill'
-import { useRegionRequest } from '../status/statusStore'
 
 type RegionProps = {
   id: string
@@ -30,10 +28,7 @@ function EditableRegion({
   const { enabled, isPhone, targeted } = useEditMode()
   const [open, setOpen] = useState(false)
   const Tag = as
-  const target = targeted[id]
-  const issue = target?.issue
-  const request = useRegionRequest(id, target)
-  const showPen = enabled && !isPhone
+  const issue = targeted[id]
 
   // On phones the whole region is the tap target. Ignore events from demo-only
   // controls (the toggle, the modal) and stop nested regions opening twice.
@@ -65,33 +60,23 @@ function EditableRegion({
       data-edit-id={id}
       data-request={issue}
       className={
-        [
-          className,
-          enabled && 'region--edit',
-          issue && 'region--targeted',
-          request && 'region--pill',
-        ]
+        [className, enabled && 'region--edit', issue && 'region--targeted']
           .filter(Boolean)
           .join(' ') || undefined
       }
       {...tapTarget}
     >
       {children}
-      {(request || showPen) && (
-        <div data-demo className="region-controls">
-          {request && <StatusPill request={request} isPhone={isPhone} />}
-          {showPen && (
-            <button
-              type="button"
-              data-demo
-              className="pen"
-              aria-label={`Request a change to ${id}`}
-              onClick={() => setOpen(true)}
-            >
-              ✎
-            </button>
-          )}
-        </div>
+      {enabled && !isPhone && (
+        <button
+          type="button"
+          data-demo
+          className="pen"
+          aria-label={`Request a change to ${id}`}
+          onClick={() => setOpen(true)}
+        >
+          ✎
+        </button>
       )}
       {open && <RequestModal regionId={id} onClose={() => setOpen(false)} />}
     </Tag>

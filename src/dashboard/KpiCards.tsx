@@ -1,10 +1,7 @@
-import { useFlag } from '../flags/useFlag'
 import { kpis } from '../mockData'
 import { Region } from './Region'
 
 export function KpiCards() {
-  const snowedIn = useFlag('req-42')
-  const cleared = useFlag('req-44')
   return (
     <div className="kpi-cards">
       <Region id="kpi-orders" className="kpi-card">
@@ -16,13 +13,11 @@ export function KpiCards() {
         <span className="kpi-card__value">{kpis.plowingNow}</span>
       </Region>
       <Region id="kpi-done" className="kpi-card">
-        <span className="kpi-card__label">{cleared ? 'Cleared' : 'Done'}</span>
+        <span className="kpi-card__label">Done</span>
         <span className="kpi-card__value">{kpis.done}</span>
       </Region>
       <Region id="kpi-buried" className="kpi-card">
-        <span className="kpi-card__label">
-          {snowedIn ? 'Snowed in' : 'Buried'}
-        </span>
+        <span className="kpi-card__label">Buried</span>
         <span className="kpi-card__value">{kpis.buried}</span>
       </Region>
     </div>

@@ -11,12 +11,6 @@ type FlagState = {
 let state: FlagState = { shipped: new Set(), overrides: new Set() }
 const listeners = new Set<() => void>()
 let pollHandle: ReturnType<typeof setInterval> | undefined
-let externalFeed = false
-
-/** Hands the shipped set to another poll (the status store); this store's own poll then stands down. */
-export function markExternalFeed(): void {
-  externalFeed = true
-}
 
 function setState(next: FlagState): void {
   state = next
@@ -36,7 +30,6 @@ function sameSet(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
 }
 
 async function pollShipped(): Promise<void> {
-  if (externalFeed) return
   try {
     const res = await fetch('/api/flags')
     if (!res.ok) return
