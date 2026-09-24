@@ -1,8 +1,0 @@
-# AC5: real submit from the page (Playwright, port 5174) with scratch:true injected into the POST so the loop ignores the issue
-modal: Filed as issue #<scratch>.
-region: data-request=19 class="kpi-card region--edit region--targeted"
-
-$ gh issue view 19 --json labels,title --jq ...
-title=kpi-buried: AC5 evidence: rename Buried to Snowed in (scratch) labels=needs-triage,lane:implement,scratch state=OPEN
-$ gh issue close 19 --comment 'AC5 evidence for #3 done'
-✓ Closed issue cwalsh003/atlas_hackathon#<scratch> (kpi-buried: AC5 evidence: rename Buried to Snowed in (scratch))

@@ -50,9 +50,15 @@ describe('App edit mode', () => {
     expect(html).toMatch(/<button[^>]*aria-pressed="false"[^>]*>Edit mode</)
   })
 
+  it('links to the vote page from the header in demo mode', async () => {
+    const html = await renderApp('1')
+    expect(html).toMatch(/<a[^>]*href="\/vote"[^>]*>Vote<\/a>/)
+  })
+
   it('renders no demo-only UI outside demo mode', async () => {
     const html = await renderApp(undefined)
     expect(html).not.toContain('Edit mode')
     expect(html).not.toContain('data-demo')
+    expect(html).not.toContain('href="/vote"')
   })
 })

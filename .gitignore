@@ -10,6 +10,8 @@ node_modules
 dist
 dist-ssr
 *.local
+# Vote page votes stay on the laptop (#7); *.local does not match this name.
+votes.local.json
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
