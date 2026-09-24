@@ -1,7 +1,9 @@
+import { useFlag } from '../flags/useFlag'
 import { workOrders, yetis } from '../mockData'
 import { Region } from './Region'
 
 export function YetiRoster() {
+  const crew = useFlag('req-49')
   const roster = yetis.map((yeti) => ({
     yeti,
     plowing: workOrders.some(
@@ -11,7 +13,7 @@ export function YetiRoster() {
 
   return (
     <Region id="roster" className="roster">
-      <h2 className="roster__title">Yeti roster</h2>
+      <h2 className="roster__title">{crew ? 'Crew roster' : 'Yeti roster'}</h2>
       <ul className="roster__list">
         {roster.map((entry) => (
           <li className="roster__item" key={entry.yeti}>

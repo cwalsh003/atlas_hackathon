@@ -1,7 +1,9 @@
+import { useFlag } from '../flags/useFlag'
 import { workOrders } from '../mockData'
 import { Region } from './Region'
 
 export function WorkOrdersTable() {
+  const crew = useFlag('req-49')
   return (
     <Region id="orders" className="orders">
       <table className="orders__table">
@@ -17,7 +19,7 @@ export function WorkOrdersTable() {
               Town
             </Region>
             <Region as="th" id="col-yeti">
-              Yeti
+              {crew ? 'Crew' : 'Yeti'}
             </Region>
             <Region as="th" id="col-status">
               Status
