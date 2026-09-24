@@ -1,7 +1,10 @@
+import { useFlag } from '../flags/useFlag'
 import { workOrders } from '../mockData'
 import { Region } from './Region'
 
 export function WorkOrdersTable() {
+  const removed = useFlag('req-58')
+  if (removed) return null
   return (
     <Region id="orders" className="orders">
       <table className="orders__table">
