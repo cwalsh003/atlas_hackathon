@@ -1,4 +1,4 @@
-/* Demo mode only: loaded from main.tsx when isDemoMode is set. */
+/* Demo mode only: imported from main.tsx when VITE_DEMO_MODE is '1'. */
 .header__vote {
   color: inherit;
 }

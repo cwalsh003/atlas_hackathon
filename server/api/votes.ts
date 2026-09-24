@@ -4,11 +4,19 @@ import type { Connect } from 'vite'
 import { createCachedFetcher } from '../cache.ts'
 import { gh, ghWithBody } from '../gh.ts'
 import { buildBody, buildTitle } from '../issueBody.ts'
+import { createRateLimiter } from '../rateLimit.ts'
 import { sourceFileHint } from '../regionSource.ts'
+import {
+  clientKey,
+  isScratchAllowed,
+  validateRequest,
+} from '../validateRequest.ts'
 import { addVote, readVotes, type Votes } from '../voteStore.ts'
 
 const CACHE_TTL_MS = 5000
 const MAX_BODY_BYTES = 4096
+const RATE_LIMIT = 10
+const RATE_WINDOW_MS = 60_000
 const VOTES_FILE = fileURLToPath(
   new URL('../../votes.local.json', import.meta.url),
 )
@@ -72,9 +80,13 @@ async function listOpenProposals(): Promise<Issue[]> {
 
 // Promotes an open proposal: files the implement-lane request, links it on the
 // proposal, closes the proposal. Returns an error for anything not a proposal.
+// Once the request is filed, later failures come back as a warning so nobody
+// retries and files a second request.
 async function promote(
   number: number,
-): Promise<{ number: number; url: string } | { error: string }> {
+): Promise<
+  { number: number; url: string; warning?: string } | { error: string }
+> {
   const issue = JSON.parse(
     await gh([
       'issue',
@@ -88,8 +100,12 @@ async function promote(
   if (issue.state !== 'OPEN' || !labels.includes('lane:vote')) {
     return { error: `#${number} is not an open proposal` }
   }
-  const request = parseRequestBody(issue.body)
-  if (!request) return { error: `#${number} is not in the request format` }
+  const parsed = parseRequestBody(issue.body)
+  if (!parsed) return { error: `#${number} is not in the request format` }
+  // The body is editable on GitHub; hold it to the same rules as a new request.
+  const valid = validateRequest({ ...parsed, lane: 'implement' })
+  if (!valid.ok) return { error: `#${number}: ${valid.error}` }
+  const request = valid.value
 
   const stdout = await ghWithBody(
     [
@@ -113,12 +129,21 @@ async function promote(
   const url = stdout.trim().split('\n').pop() ?? ''
   const match = url.match(/\/issues\/(\d+)$/)
   if (!match) throw new Error(`unexpected gh output: ${stdout}`)
+  const warnings: string[] = []
   await ghWithBody(
     ['issue', 'comment', String(number)],
     `Promoted to an implement-lane request: ${url}\n`,
+  ).catch((error: Error) =>
+    warnings.push(`could not comment the link on #${number}: ${error.message}`),
   )
-  await gh(['issue', 'close', String(number)])
-  return { number: Number(match[1]), url }
+  await gh(['issue', 'close', String(number)]).catch((error: Error) =>
+    warnings.push(`could not close #${number}: ${error.message}`),
+  )
+  return {
+    number: Number(match[1]),
+    url,
+    ...(warnings.length ? { warning: warnings.join('; ') } : {}),
+  }
 }
 
 // Resolves null when the body exceeds the cap, without buffering the rest.
@@ -153,6 +178,9 @@ export function createVotesHandler(
   votesFile: string,
 ): Connect.NextHandleFunction {
   let fetchIssues = createCachedFetcher(listOpenProposals, CACHE_TTL_MS)
+  const rateLimited = createRateLimiter(RATE_LIMIT, RATE_WINDOW_MS)
+  // Single flight per proposal: a double click must not file two requests.
+  const promoting = new Set<number>()
 
   async function proposals() {
     const [issues, votes] = await Promise.all([
@@ -165,13 +193,21 @@ export function createVotesHandler(
   return async (req, res, next) => {
     // Plain `npm run dev` must not expose the vote page's endpoint.
     if (process.env.VITE_DEMO_MODE !== '1') return next()
+    const remoteAddress = req.socket.remoteAddress
+    // Promote is for the demo operator at the laptop, never through the tunnel.
+    const canPromote = isScratchAllowed(req.headers, remoteAddress)
     try {
       if (req.method === 'GET') {
-        return send(res, 200, { proposals: await proposals() })
+        return send(res, 200, { proposals: await proposals(), canPromote })
       }
       if (req.method !== 'POST') {
         res.setHeader('allow', 'GET, POST')
         return send(res, 405, { error: 'method not allowed' })
+      }
+      if (rateLimited(clientKey(req.headers, remoteAddress))) {
+        return send(res, 429, {
+          error: 'too many requests, try again in a minute',
+        })
       }
 
       const raw = await readBody(req)
@@ -198,11 +234,26 @@ export function createVotesHandler(
       }
 
       if (action === 'promote') {
-        const result = await promote(number)
-        if ('error' in result) return send(res, 400, result)
-        // Start a fresh cache so the closed proposal leaves the list at once.
-        fetchIssues = createCachedFetcher(listOpenProposals, CACHE_TTL_MS)
-        return send(res, 201, result)
+        if (!canPromote) {
+          return send(res, 403, {
+            error: 'only the demo operator can promote a proposal',
+          })
+        }
+        if (promoting.has(number)) {
+          return send(res, 409, {
+            error: `#${number} is already being promoted`,
+          })
+        }
+        promoting.add(number)
+        try {
+          const result = await promote(number)
+          if ('error' in result) return send(res, 400, result)
+          // Start a fresh cache so the closed proposal leaves the list at once.
+          fetchIssues = createCachedFetcher(listOpenProposals, CACHE_TTL_MS)
+          return send(res, 201, result)
+        } finally {
+          promoting.delete(number)
+        }
       }
       if (action !== undefined) {
         return send(res, 400, { error: 'action must be promote' })

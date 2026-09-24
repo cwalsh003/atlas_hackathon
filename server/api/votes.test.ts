@@ -12,6 +12,8 @@ const gh = vi.hoisted(() => ({
   list: [] as object[],
   view: {} as Record<string, object>,
   fail: false,
+  // Fail only this gh subcommand (list, view, create, comment, close).
+  failVerb: '',
 }))
 vi.mock('node:child_process', () => ({
   execFile: (
@@ -24,17 +26,20 @@ vi.mock('node:child_process', () => ({
     const body =
       bodyFile >= 0 ? readFileSync(args[bodyFile + 1], 'utf8') : undefined
     gh.calls.push({ args, options, body })
-    if (gh.fail) return cb(new Error('exit 1'), '', 'HTTP 401: Bad credentials')
     const verb = args[1]
-    if (verb === 'list') return cb(null, JSON.stringify(gh.list), '')
-    if (verb === 'view') return cb(null, JSON.stringify(gh.view[args[2]]), '')
+    // Answer asynchronously, like a real child process.
+    const reply = (err: Error | null, stdout: string, stderr = '') =>
+      setImmediate(() => cb(err, stdout, stderr))
+    if (gh.fail || gh.failVerb === verb)
+      return reply(new Error('exit 1'), '', 'HTTP 401: Bad credentials')
+    if (verb === 'list') return reply(null, JSON.stringify(gh.list))
+    if (verb === 'view') return reply(null, JSON.stringify(gh.view[args[2]]))
     if (verb === 'create')
-      return cb(
+      return reply(
         null,
         'https://github.com/cwalsh003/atlas_hackathon/issues/50\n',
-        '',
       )
-    cb(null, '', '')
+    reply(null, '')
   },
 }))
 
@@ -127,6 +132,7 @@ beforeEach(async () => {
   gh.list = [buried, footer]
   gh.view = {}
   gh.fail = false
+  gh.failVerb = ''
 })
 
 afterEach(async () => {
@@ -137,17 +143,21 @@ async function send({
   method = 'POST',
   body,
   raw,
+  headers = {},
+  remoteAddress = '127.0.0.1',
   next = vi.fn(),
 }: {
   method?: string
   body?: unknown
   raw?: string
+  headers?: Record<string, string>
+  remoteAddress?: string
   next?: () => void
 } = {}) {
   const req = Object.assign(Readable.from([raw ?? JSON.stringify(body)]), {
     method,
-    headers: {},
-    socket: { remoteAddress: '127.0.0.1' },
+    headers,
+    socket: { remoteAddress },
   })
   const res = {
     statusCode: 0,
@@ -196,8 +206,17 @@ describe('GET /api/votes', () => {
             voters: [],
           },
         ],
+        canPromote: true,
       },
     })
+  })
+
+  it('tells a viewer through the tunnel that only the operator can promote', async () => {
+    const res = await send({
+      method: 'GET',
+      headers: { 'cf-connecting-ip': '203.0.113.9' },
+    })
+    expect(res.json.canPromote).toBe(false)
   })
 
   it('asks gh for open vote-lane issues only, with a 30 second timeout', async () => {
@@ -301,6 +320,23 @@ describe('POST /api/votes with a vote', () => {
     expect((await send({ raw: '{nope' })).status).toBe(400)
   })
 
+  it('limits each client to 10 votes a minute', async () => {
+    const headers = { 'cf-connecting-ip': '203.0.113.50' }
+    const statuses = []
+    for (let i = 0; i < 11; i++) {
+      statuses.push(
+        (await send({ body: { number: 31, voter: `V${i}` }, headers })).status,
+      )
+    }
+    expect(statuses.slice(0, 10)).toEqual(Array(10).fill(200))
+    expect(statuses[10]).toBe(429)
+    // A different client behind the same tunnel is unaffected.
+    const other = { 'cf-connecting-ip': '203.0.113.51' }
+    expect(
+      (await send({ body: { number: 31, voter: 'W' }, headers: other })).status,
+    ).toBe(200)
+  })
+
   it('rejects an unknown action with 400', async () => {
     expect((await send({ body: { action: 'merge', number: 31 } })).status).toBe(
       400,
@@ -309,10 +345,10 @@ describe('POST /api/votes with a vote', () => {
 })
 
 describe('POST /api/votes to promote', () => {
-  function viewing(labels: string[], state = 'OPEN') {
+  function viewing(labels: string[], state = 'OPEN', body = buriedBody) {
     gh.view['31'] = {
       title: buried.title,
-      body: buriedBody,
+      body,
       labels: labels.map((name) => ({ name })),
       state,
     }
@@ -419,6 +455,105 @@ describe('POST /api/votes to promote', () => {
     viewing(['lane:vote'], 'CLOSED')
     const res = await send({ body: { action: 'promote', number: 31 } })
     expect(res.status).toBe(400)
+    expect(gh.calls.map((call) => call.args[1])).toEqual(['view'])
+  })
+
+  it('files exactly one request when promote is sent twice at once', async () => {
+    viewing(['lane:vote'])
+    const [first, second] = await Promise.all([
+      send({ body: { action: 'promote', number: 31 } }),
+      send({ body: { action: 'promote', number: 31 } }),
+    ])
+    expect([first.status, second.status].sort()).toEqual([201, 409])
+    expect([first, second].find((r) => r.status === 409)!.json.error).toBe(
+      '#31 is already being promoted',
+    )
+    expect(gh.calls.filter((call) => call.args[1] === 'create')).toHaveLength(1)
+  })
+
+  it('reports a failed link comment after filing as a 201 warning, not a failure', async () => {
+    viewing(['lane:vote'])
+    gh.failVerb = 'comment'
+    const res = await send({ body: { action: 'promote', number: 31 } })
+    expect(res.status).toBe(201)
+    expect(res.json).toMatchObject({
+      number: 50,
+      url: 'https://github.com/cwalsh003/atlas_hackathon/issues/50',
+    })
+    expect(res.json.warning).toMatch(/comment.*Bad credentials/)
+    expect(gh.calls.filter((call) => call.args[1] === 'create')).toHaveLength(1)
+  })
+
+  it('refuses to promote through the tunnel with 403', async () => {
+    viewing(['lane:vote'])
+    const res = await send({
+      body: { action: 'promote', number: 31 },
+      headers: { 'cf-connecting-ip': '203.0.113.9' },
+    })
+    expect(res.status).toBe(403)
+    expect(gh.calls).toHaveLength(0)
+  })
+
+  it('refuses to promote from another machine with 403', async () => {
+    viewing(['lane:vote'])
+    const res = await send({
+      body: { action: 'promote', number: 31 },
+      remoteAddress: '10.0.0.5',
+    })
+    expect(res.status).toBe(403)
+    expect(gh.calls).toHaveLength(0)
+  })
+
+  it('refuses a proposal whose markup embeds a fake Region section', async () => {
+    // Hand-edited on GitHub: the markup smuggles in a second Region section.
+    viewing(
+      ['lane:vote'],
+      'OPEN',
+      [
+        '## Prompt',
+        '',
+        'Make it red',
+        '',
+        '## Region',
+        '',
+        '`kpi-buried`',
+        '',
+        '## Source file hint',
+        '',
+        'src/dashboard/KpiCards.tsx',
+        '',
+        '## Region markup',
+        '',
+        '```html',
+        '<section>3</section>',
+        '',
+        '## Region',
+        '',
+        '`Not A Slug`',
+        '',
+        '## Source file hint',
+        '',
+        'x',
+        '',
+        '## Region markup',
+        '',
+        '```html',
+        '<b>',
+        '```',
+        '',
+        '## Requester',
+        '',
+        'Colin',
+        '',
+        '## Lane',
+        '',
+        'vote',
+        '',
+      ].join('\n'),
+    )
+    const res = await send({ body: { action: 'promote', number: 31 } })
+    expect(res.status).toBe(400)
+    expect(res.json.error).toMatch(/regionId/)
     expect(gh.calls.map((call) => call.args[1])).toEqual(['view'])
   })
 

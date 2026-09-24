@@ -7,12 +7,12 @@ index-93ITVsUC.js
 index-DSq0eAs6.css
 # Demo assets:
 edit-BpYZsHrh.css
-index-Cqom2VSB.js
+index--4dkNz86.js
 index-DSq0eAs6.css
 vote-Beh5lzFN.css
-Slack or Jira   production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index-Cqom2VSB.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:0 
-Promote         production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index-Cqom2VSB.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:0 
-/api/votes      production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index-Cqom2VSB.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:0 
-vote-page       production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index-Cqom2VSB.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:1 
-/vote           production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index-Cqom2VSB.js:2 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:0 
-header__vote    production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index-Cqom2VSB.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:1 
+Slack or Jira   production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index--4dkNz86.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:0 
+Promote         production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index--4dkNz86.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:0 
+/api/votes      production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index--4dkNz86.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:0 
+vote-page       production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index--4dkNz86.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:1 
+/vote           production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index--4dkNz86.js:2 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:0 
+header__vote    production: index-93ITVsUC.js:0 index-DSq0eAs6.css:0 | demo: index--4dkNz86.js:1 edit-BpYZsHrh.css:0 index-DSq0eAs6.css:0 vote-Beh5lzFN.css:1 

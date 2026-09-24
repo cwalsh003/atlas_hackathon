@@ -15,7 +15,12 @@ type Proposal = {
   voters: string[]
 }
 
-type Promoted = { proposal: number; number: number; url: string }
+type Promoted = {
+  proposal: number
+  number: number
+  url: string
+  warning?: string
+}
 
 async function call(init?: { body: object }) {
   const res = await fetch(
@@ -33,6 +38,7 @@ async function call(init?: { body: object }) {
 
 export function VotePage() {
   const [proposals, setProposals] = useState<Proposal[] | null>(null)
+  const [canPromote, setCanPromote] = useState(false)
   const [voter, setVoter] = useState(
     () => localStorage.getItem(REQUESTER_KEY) ?? '',
   )
@@ -45,7 +51,10 @@ export function VotePage() {
     async function load() {
       try {
         const json = await call()
-        if (active) setProposals(json.proposals)
+        if (!active) return
+        setProposals(json.proposals)
+        setCanPromote(json.canPromote === true)
+        setError('')
       } catch (err) {
         if (active) setError((err as Error).message)
       }
@@ -117,7 +126,7 @@ export function VotePage() {
           <a href={p.url} target="_blank" rel="noreferrer">
             issue #{p.number}
           </a>
-          .
+          .{p.warning && ` Warning: ${p.warning}.`}
         </p>
       ))}
       {proposals === null ? (
@@ -149,14 +158,16 @@ export function VotePage() {
                   >
                     {voted ? 'Voted' : 'Vote'}
                   </button>
-                  <button
-                    type="button"
-                    className="vote-page__promote"
-                    disabled={pending !== null}
-                    onClick={() => promote(p.number)}
-                  >
-                    Promote
-                  </button>
+                  {canPromote && (
+                    <button
+                      type="button"
+                      className="vote-page__promote"
+                      disabled={pending !== null}
+                      onClick={() => promote(p.number)}
+                    >
+                      Promote
+                    </button>
+                  )}
                 </div>
               </li>
             )
