@@ -1,0 +1,122 @@
+# Large request #49: filed through the modal on http://localhost:5173 (region orders, Build it, no scratch)
+# Captured 2026-09-24T15:32:04Z. Loop run from feat/8-large-route against SERVED_CHECKOUT=/Users/cwalsh/hack_atlas.
+
+## Issue
+#49 orders: Rename the Yeti column to Crew in the work-orders table and the roster
+state=OPEN created=2026-09-24T15:19:49Z
+labels=needs-triage,ready-for-agent,plan-review,lane:implement,size:large
+assignees=cwalsh003
+
+## GitHub timeline events
+2026-09-24T15:19:50Z labeled needs-triage
+2026-09-24T15:19:50Z labeled lane:implement
+2026-09-24T15:20:15Z labeled size:large
+2026-09-24T15:20:16Z labeled ready-for-agent
+2026-09-24T15:20:22Z labeled planning
+2026-09-24T15:20:23Z assigned cwalsh003
+2026-09-24T15:20:25Z locked 
+2026-09-24T15:24:40Z commented 
+2026-09-24T15:25:15Z unlabeled planning
+2026-09-24T15:25:15Z labeled plan-review
+2026-09-24T15:25:16Z unlocked 
+
+## Loop log lines for #49
+2026-09-24T11:20:16 triage #49 size:large + ready-for-agent
+2026-09-24T11:20:24 claim #49 (large): plan
+2026-09-24T11:20:26 #49 plan (output in /Users/cwalsh/hack_atlas/.claude/worktrees/8/atlas_hackathon/.claude/loop-req-49-plan.json)
+2026-09-24T11:25:16 #49 plan-review: plan posted; approve with: gh issue edit 49 --remove-label plan-review --add-label in-progress
+
+## Plan run (.claude/loop-req-49-plan.json)
+subtype=success is_error=false duration_ms=284150 num_turns=0 total_cost_usd=2.8817267500000003
+
+## Measured
+filed 11:19:49 local (15:19:49Z, modal response); triaged size:large 11:20:16 (+27 s); claimed + planning 11:20:24 (+35 s); plan comment 11:24:40 (+291 s); plan-review 11:25:16 (+327 s); plan run 11:20:26-11:25:16 (290 s)
+
+## gh issue view 49 --comments
+author:	cwalsh003
+association:	owner
+edited:	false
+status:	none
+--
+[EXECUTION PLAN] for #49
+
+Plan only. No code, branch, commit, push, or PR was created. Red-team review skipped (unattended run). Derived from the issue body alone; no other comment existed at planning time.
+
+## Intent
+
+Behind `useFlag('req-49')`, the work-orders table's `col-yeti` column header reads **Crew** instead of **Yeti**, and the roster title reads **Crew roster** instead of **Yeti roster**. With the flag off both regions render exactly as today. Two regions (`orders`/`col-yeti` and `roster`) is why triage sized this large; nothing else about it is large.
+
+## Read this first: two things the human should decide at plan review
+
+1. **`main` lost shipped work in PR #48 (merge `ee6ca91`).** Its squash removed the status pill (`src/status/*`, `server/api/requests.status.ts`, #5), the vote page (`src/vote/*`, `server/api/votes.ts`, #7), and the `useFlag('req-42')`, `useFlag('req-44')`, `useFlag('req-45')` branches in `src/dashboard/KpiCards.tsx` and `src/dashboard/Footer.tsx` (plus their tests), while #42, #44, #45 are still labelled `shipped`. Compare `git ls-tree -r --name-only 98ca03c` with `ee6ca91`. Consequences: the served dashboard shows no pill (so no "waiting for approval" for this request), and the #8 large-route evidence cannot be captured until it is restored. Recommended: restore those paths from `98ca03c` in a separate PR before or independently of #49. This plan does not touch them. #49's files were not changed by #48, so #49 merges cleanly in either order.
+2. **Proof-artifact root.** `docs/agents/testing.md` says clear `test-results/` before capturing evidence for each work package, but `docs/runbook-loop.md` links to the #6 evidence that lives there. This plan needs no committed artifact (every criterion is proved by a test or command result recorded in the PR and closeout), so it writes nothing under `test-results/` and leaves the #6 evidence in place. Say so at plan review if you want the root cleared instead.
+
+## Affected areas
+
+- `src/dashboard/WorkOrdersTable.tsx` — region `orders`, column-header region `col-yeti`. Change the visible header text only. The edit id `col-yeti` stays (stable region id, asserted by `src/App.test.tsx`, read by `scripts/loop.sh` triage).
+- `src/dashboard/YetiRoster.tsx` — region `roster`. Change the `<h2 class="roster__title">` text only. The React component name `YetiRoster`, the `yeti` data field, the `yetis` list, and the yeti names (Frosty, Blizzard, ...) stay: they are data, not the requested label, and renaming them adds files to the diff for nothing.
+- Interfaces: `useFlag` from `src/flags/useFlag.ts` (unchanged). Flag id is exactly `req-49`.
+- Domain: `CONTEXT.md` keeps **yeti** as the domain term; "Crew" is viewer-facing label text inside the fictional client's dashboard, not a new concept. No glossary or ADR change. No conflict with ADR 0001 (no registry file) or ADR 0002.
+
+## Steps (in order)
+
+1. Branch `req/49` from `origin/main` (this worktree already is; `npm ci` first, Node 22 via fnm).
+2. `WorkOrdersTable.tsx`: `import { useFlag } from '../flags/useFlag'`; `const crew = useFlag('req-49')`; header becomes `{crew ? 'Crew' : 'Yeti'}`.
+3. `YetiRoster.tsx`: same import and call; title becomes `{crew ? 'Crew roster' : 'Yeti roster'}`.
+4. Add `src/dashboard/WorkOrdersTable.test.tsx` and `src/dashboard/YetiRoster.test.tsx`, following the pattern of the (now deleted) `src/dashboard/KpiCards.test.tsx` at `98ca03c`: `vi.stubEnv('VITE_DEMO_MODE', '1')`, `vi.resetModules()`, import `setShipped` from `../flags/flagStore.ts` and `App` from `../App.tsx`, `setShipped(new Set(shipped))`, `renderToString(<App />)`, then match `data-edit-id="col-yeti"[^>]*>([^<]*)<` and `class="roster__title">([^<]*)<`. Two tests per file: shipped `[]` gives the old text, shipped `['req-49']` gives the new text. `afterEach(vi.unstubAllEnvs)`.
+5. `npm run format && npm test && npm run typecheck && npm run lint && npm run build`, all exit 0.
+6. Commit `Rename the Yeti column to Crew in the work-orders table and the roster behind req-49 (#49)`, push `req/49`, `gh pr create --base main --head req/49` with a body that says `Refs #49` (no closing keyword) and the verification results.
+
+Dependencies: none. No new data fields, no dependency, no CSS, no server change.
+
+## Scope
+
+In scope (exactly four files): `src/dashboard/WorkOrdersTable.tsx`, `src/dashboard/YetiRoster.tsx`, `src/dashboard/WorkOrdersTable.test.tsx` (new), `src/dashboard/YetiRoster.test.tsx` (new).
+
+Excluded: the header nav "Yetis" (`Header.tsx`), the chart title "Orders per yeti" (`OrdersChart.tsx`), `mockData.ts`, the `yeti` field and yeti names, the `YetiRoster` component name, region ids, `CONTEXT.md`, CSS, `server/`, `src/flags/`, `src/demoMode.ts`, `test-results/`, and anything from finding 1 above.
+
+## Acceptance criteria
+
+- AC1 Flag off: `col-yeti` header renders `Yeti` and roster title renders `Yeti roster`, byte-for-byte as before.
+- AC2 Flag on (`req-49` in the shipped set): header renders `Crew`, title renders `Crew roster`.
+- AC3 All 15 region edit ids still render, `col-yeti` included; non-demo build renders no demo-only UI.
+- AC4 Every changed non-test source file contains `useFlag('req-49')`; no other flag id is touched; no registry file; no file outside the four listed.
+- AC5 Full check set green on the branch and in CI.
+- AC6 (human-gated) After the PR is merged, the loop labels #49 `shipped` and every viewer of the served demo dashboard sees `Crew` and `Crew roster` without a reload.
+
+Definition of Done: AC1–AC5 PASS with evidence in the PR description and the `[CLOSEOUT]` comment; PR open against `main` referencing #49; issue in `human-review`; AC6 verified by the human after merge.
+
+## Verification map (run surface: local only)
+
+| Criterion | How | Real dependency | Expected | Evidence location | Earliest checkpoint | Invalidated by |
+|---|---|---|---|---|---|---|
+| AC1, AC2 | `npm test` (both new test files; `npx vitest run src/dashboard` while iterating) | none (Vitest, SSR render, `setShipped` injection) | 4 new tests pass | Vitest output quoted in PR/closeout | after step 4 | any edit to the two components, `useFlag`, `flagStore`, `App.tsx` |
+| AC3 | `npm test` (`src/App.test.tsx`, existing) | none | "renders all 15 dashboard regions" and "renders no demo-only UI outside demo mode" pass | same | after step 3 | any edit to region ids or `Region.tsx` |
+| AC4 | `git diff --name-only origin/main` shows only the four files; `grep -n "useFlag('req-49')" src/dashboard/WorkOrdersTable.tsx src/dashboard/YetiRoster.tsx` hits each once; `git diff origin/main` contains no other `req-` id; after the PR opens, `node scripts/mergeGate.ts <pr> 49` exits 0 (`{"pass":true}`) | `gh` (PR files API) for the gate | listed outputs | command output in closeout | after step 6 (gate), step 3 (grep/diff) | any further commit on the branch |
+| AC5 | `npm run format:check && npm run lint && npm run typecheck && npm test && npm run build` locally; `gh pr checks <pr> --watch` for CI | GitHub Actions | all exit 0; CI `checks` job green | command exits in closeout; CI run URL in PR | after step 5 (local), after step 6 (CI) | any further commit |
+| AC6 | Human gate, below | `gh` (shipped label), running `npm run dev:demo` and `scripts/loop.sh` on the served checkout | dashboard shows `Crew` / `Crew roster` for a viewer with no override | human observation recorded on the issue | after merge | nothing on this branch; a change to `/api/flags` or the loop's shipped step |
+
+Fixtures: none. No external provisioning or cleanup. The `shipped` label is the only real-dependency seam and is exercised by AC6 against the real loop and `gh`.
+
+Candidate evidence gathered during planning: none. The planning worktree has no `node_modules` (`npm ci` was outside the unattended allowlist) and `node` on PATH is 16, so no check ran. Baseline for the implementer: `origin/main` at `ee6ca91` was green in CI for PR #48.
+
+## Human gates
+
+- G1 Plan approval. Prerequisite: this comment and the loop's move to `plan-review`. Action: remove `plan-review`, add `in-progress` on #49 (and decide findings 1 and 2). Expected: the loop's large route runs `/atlas-implement 49` and a PR opens. Post-check: PR exists with `Refs #49`; issue reaches `human-review`.
+- G2 Merge. Prerequisite: PR green, `[AI CODE REVIEW]` and `[CLOSEOUT]` posted. Action: review and merge the PR. Expected: within one loop cycle #49 is labelled `shipped` and the served checkout pulls. Post-check (AC6): open the demo dashboard with no `?flag=` override; the `Yeti` column reads `Crew` and the roster title reads `Crew roster`; `curl -s localhost:5173/api/flags` lists 49.
+
+## Tracker mutations in this run
+
+- This one `[EXECUTION PLAN]` comment. No label change: the loop moves #49 to `plan-review`.
+
+Next: after G1, `/atlas-implement 49`.
+
+--
+
+## Pill screenshot (not captured)
+The 'waiting for approval' pill screenshot was not possible: the #48 squash (ee6ca91) had removed the status pill and /api/requests/status from main while #49 sat at plan-review (11:25:16-approval). PR #53 (df4406f) restored them after the human had already approved #49, so plan-review could no longer be shown. The label mapping (src/status/pillState.ts) is plan-review -> 'waiting for approval'.
+
+## Status endpoint for #49 after approval (2026-09-24T19:09:26Z), labels: needs-triage,ready-for-agent,in-progress,lane:implement,size:large
+{"number":49,"regionId":"orders","state":"building","url":"https://github.com/cwalsh003/atlas_hackathon/issues/49","assigned":true}
+
+Note: the plan output file was renamed from loop-req-<n>-plan.json to loop-req-<n>-plan.log (git-ignored) before the commit; the log line above shows the old name.

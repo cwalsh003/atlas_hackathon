@@ -1,0 +1,3 @@
+2026-09-24T19:22:00.198Z before: "YETI\n✎" "Yeti roster"
+2026-09-24T19:22:32.319Z after: "CREW\n✎" "Crew roster" pill: shipped page loads: 1
+pill after next poll: shipped

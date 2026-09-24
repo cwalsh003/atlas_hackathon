@@ -1,0 +1,21 @@
+Large route and declined path, measured 2026-09-24 (LOOP_INTERVAL=20, IMPLEMENT_MODE=atlas). Local time (EDT).
+Sources: test-results/loop.log, test-results/large/*/timeline.txt, test-results/declined/comment.txt, test-results/small-regression/timeline.txt.
+
+Large request #49 (orders + roster, PR #54)
+  filed (modal)                        11:19:49
+  triaged size:large + ready-for-agent 11:20:16   +27 s
+  claimed, planning, locked            11:20:24   +35 s
+  plan run (/atlas:atlas-plan)         11:20:26-11:25:16   284 s run (290 s wall), $2.88, planner posted [EXECUTION PLAN] itself
+  plan-review, unlocked                11:25:16   +327 s from filing
+  human approval (in-progress)         15:08:42   (human gate 1; the wait included the PR #53 restore of main)
+  implement run (/atlas:atlas-implement) 15:09:41-15:16:42  PR #54 created 15:15:34; $5.10, 15 turns
+  approval to PR open + human-review   421 s (15:09:41 loop pickup to 15:16:43; loop restarted at 15:09:33 after the approval)
+  human merge (PR #54)                 15:21:29   (human gate 2; loop stopped at the time)
+  loop restart -> shipped              15:22:14 -> 15:22:26   12 s, first cycle
+  dashboard change visible, no reload  15:22:32   6 s after shipped (next status poll)
+
+Declined request #50 ("make it Tuesday", while #49 sat at plan-review)
+  filed 11:25:29 -> needs-info + [TRIAGE] comment 11:25:42   13 s, within one cycle
+
+Small regression #51 (kpi-plowing, PR #52, while #49 sat at plan-review)
+  filed 11:25:33 -> triaged 11:26:16 -> claimed 11:26:50 -> PR 11:31:27 -> shipped 11:31:40   filed-to-shipped 368 s
