@@ -1,0 +1,10 @@
+# AC3: a request filed from a second browser shows a pill on the matching region in the first browser within ten seconds, with no action taken in the first browser
+# Playwright 1.63 Chromium, two separate browser contexts (A = first browser, B = second browser), dev server on http://localhost:5176 (npm run dev:demo -- --port 5176 --strictPort).
+# B filed through the real request modal (Edit mode -> pen on region chart -> Build it); page.route added scratch: true to the POST body so the issue carries the scratch label.
+# A loaded the page before B filed and received no clicks, key presses, or reloads afterwards; the script only waited for [data-edit-id="chart"] .pill.
+A pill on chart before B filed: 0
+B filed issue #26 at 2026-09-24T13:37:03.641Z
+A showed the pill at 2026-09-24T13:37:12.077Z: "queued" class="pill pill--queued" href="https://github.com/cwalsh003/atlas_hackathon/issues/26"
+Seconds from filing to pill in A: 8.4
+A page-load marker unchanged (no reload): true (navigation entries 1 -> 1)
+Screenshots: first-browser.png (A, pill on the chart region, edit mode off), second-browser.png (B after filing).

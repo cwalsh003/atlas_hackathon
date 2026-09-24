@@ -1,0 +1,26 @@
+# AC2: GET /api/requests/status (optional ids=...) returns state, region id, and issue URL for every request issue plus any requested ids;
+#      two calls within 5 s with different id lists make one gh list call
+# Recaptured after the review fixes (rate-limited id lookups, id cap, failure caching).
+# Dev server: npm run dev:demo -- --port 5176 --strictPort, started with a logging shim first on PATH that appends
+# every gh invocation the dev server makes to gh-calls.log and then execs the real gh.
+# On the board: open scratch issues #31 (kpi-orders, wontfix -> declined, with its latest comment) and #32 (header, queued).
+# ids=34: vote-lane scratch issue, not on the board, fetched individually and returned (region roster).
+# ids=5: issue 5 is not lane:implement, so it is fetched individually; its title has no '<region id>:' prefix, so it is dropped.
+# ids=100001: above the id cap, ignored without a gh call.
+
+$ curl -s 'http://localhost:5176/api/requests/status?ids=34'    # at 09:56:44
+{"requests":[{"number":32,"regionId":"header","state":"queued","url":"https://github.com/cwalsh003/atlas_hackathon/issues/32","assigned":false},{"number":31,"regionId":"kpi-orders","state":"declined","url":"https://github.com/cwalsh003/atlas_hackathon/issues/31","assigned":true,"comment":"Declined for the #5 evidence run: this change is too large for the demo."},{"number":34,"regionId":"roster","state":"queued","url":"https://github.com/cwalsh003/atlas_hackathon/issues/34","assigned":false}],"shipped":[]}
+HTTP 200
+
+$ curl -s 'http://localhost:5176/api/requests/status?ids=5,100001'    # at 09:56:46
+{"requests":[{"number":32,"regionId":"header","state":"queued","url":"https://github.com/cwalsh003/atlas_hackathon/issues/32","assigned":false},{"number":31,"regionId":"kpi-orders","state":"declined","url":"https://github.com/cwalsh003/atlas_hackathon/issues/31","assigned":true,"comment":"Declined for the #5 evidence run: this change is too large for the demo."}],"shipped":[]}
+HTTP 200
+
+$ cat gh-calls.log   # every gh call the dev server made during the two curls
+09:56:44 gh issue list --state all --label lane:implement --limit 200 --json number,title,labels,assignees,state,url
+09:56:45 gh issue view 34 --json number,title,labels,assignees,state,url
+09:56:45 gh issue view 31 --json comments
+09:56:46 gh issue view 5 --json number,title,labels,assignees,state,url
+
+$ grep -c 'issue list --state all --label lane:implement' gh-calls.log
+1
