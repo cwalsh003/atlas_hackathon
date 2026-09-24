@@ -57,6 +57,24 @@
   gap: 6px;
 }
 
+/* Header: controls sit on the toggle's line, with room reserved so a pill never covers the toggle. */
+.header > .region-controls {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.header.region--pill {
+  padding-right: 220px;
+}
+
+/* KPI cards are too narrow to share the label's line: the controls take a row of their own. */
+.kpi-card > .region-controls {
+  position: static;
+  order: -1;
+  align-self: flex-end;
+  margin: -12px -12px -4px 0;
+}
+
 .pen {
   display: grid;
   place-items: center;
@@ -95,6 +113,7 @@
   text-decoration: none;
   text-transform: none;
   letter-spacing: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .pill--triaging {
@@ -236,5 +255,21 @@
 @media (max-width: 720px) {
   .request-modal__lanes {
     grid-template-columns: 1fr;
+  }
+
+  /* Keep a tapped comment on screen for a pill in the left-hand column. */
+  .pill__comment {
+    max-width: 45vw;
+  }
+
+  /* Phones: a header pill gets a strip of its own above the header content. */
+  .header.region--pill {
+    padding-top: 40px;
+    padding-right: 16px;
+  }
+
+  .header > .region-controls {
+    top: 8px;
+    transform: none;
   }
 }

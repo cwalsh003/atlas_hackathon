@@ -3,9 +3,13 @@ import type { ServerResponse } from 'node:http'
 import type { Connect } from 'vite'
 import { pillState, type RequestStatus } from '../../src/status/pillState.ts'
 import { createCachedFetcher } from '../cache.ts'
+import { createRateLimiter } from '../rateLimit.ts'
+import { clientKey } from '../validateRequest.ts'
 
 const CACHE_TTL_MS = 5000
 const MAX_IDS = 20
+const MAX_ID = 100_000
+const MAX_CACHED_IDS = 500
 const FIELDS = 'number,title,labels,assignees,state,url'
 const REGION_PREFIX = /^([a-z][a-z0-9-]*):/
 
@@ -37,22 +41,33 @@ function parseIds(url: string | undefined): number[] {
   const ids = (raw ?? '')
     .split(',')
     .map(Number)
-    .filter((n) => Number.isInteger(n) && n > 0)
+    .filter((n) => Number.isInteger(n) && n > 0 && n <= MAX_ID)
   return [...new Set(ids)].slice(0, MAX_IDS)
 }
 
-// ponytail: one cache per issue number, never evicted; bounded by the repo's issue count.
-function cachedPerId<T>(
-  fetch: (n: number) => Promise<T>,
-): (n: number) => Promise<T> {
-  const caches = new Map<number, () => Promise<T>>()
-  return (n) => {
-    let cached = caches.get(n)
-    if (!cached) {
-      cached = createCachedFetcher(() => fetch(n), CACHE_TTL_MS)
-      caches.set(n, cached)
-    }
-    return cached()
+/**
+ * Per-issue cache for lookups that never reject. An entry is fresh for the
+ * ttl after its fetch resolves; `get(n, false)` serves whatever is held, stale
+ * or not, without calling gh.
+ */
+// ponytail: cleared outright past MAX_CACHED_IDS entries; an LRU if that ever churns.
+function cachedPerId<T>(fetch: (n: number) => Promise<T>) {
+  const cache = new Map<number, { value: Promise<T>; expiresAt: number }>()
+  return {
+    isFresh: (n: number) => (cache.get(n)?.expiresAt ?? 0) > Date.now(),
+    get(n: number, mayFetch = true): Promise<T> | undefined {
+      const entry = cache.get(n)
+      if (entry && (entry.expiresAt > Date.now() || !mayFetch))
+        return entry.value
+      if (!mayFetch) return undefined
+      if (!entry && cache.size >= MAX_CACHED_IDS) cache.clear()
+      const next = { value: fetch(n), expiresAt: Infinity }
+      cache.set(n, next)
+      void next.value.then(() => {
+        next.expiresAt = Date.now() + CACHE_TTL_MS
+      })
+      return next.value
+    },
   }
 }
 
@@ -64,9 +79,12 @@ function send(res: ServerResponse, status: number, body: object) {
 
 /** Builds the `/api/requests/status` handler around an injectable `gh` runner. */
 export function createStatusHandler(gh: Gh): Connect.NextHandleFunction {
-  const listIssues = createCachedFetcher(
-    async () =>
-      JSON.parse(
+  // A failed list keeps serving the last good one (empty at first) until the
+  // ttl lapses, so an outage costs one gh call per 5 s, not one per viewer poll.
+  let lastList: Issue[] = []
+  const listIssues = createCachedFetcher(async () => {
+    try {
+      lastList = JSON.parse(
         await gh([
           'issue',
           'list',
@@ -79,10 +97,12 @@ export function createStatusHandler(gh: Gh): Connect.NextHandleFunction {
           '--json',
           FIELDS,
         ]),
-      ) as Issue[],
-    CACHE_TTL_MS,
-  )
-  // A missing or unreadable issue caches as null so it is not retried per caller.
+      ) as Issue[]
+    } catch {
+      // Keep lastList.
+    }
+    return lastList
+  }, CACHE_TTL_MS)
   const viewIssue = cachedPerId(async (n) => {
     try {
       return JSON.parse(
@@ -93,11 +113,17 @@ export function createStatusHandler(gh: Gh): Connect.NextHandleFunction {
     }
   })
   const latestComment = cachedPerId(async (n) => {
-    const { comments } = JSON.parse(
-      await gh(['issue', 'view', String(n), '--json', 'comments']),
-    ) as { comments: { body: string }[] }
-    return comments.at(-1)?.body
+    try {
+      const { comments } = JSON.parse(
+        await gh(['issue', 'view', String(n), '--json', 'comments']),
+      ) as { comments: { body: string }[] }
+      return comments.at(-1)?.body
+    } catch {
+      return undefined
+    }
   })
+  // ids= is the only caller-controlled source of gh calls, so only lookups for it are limited.
+  const overLimit = createRateLimiter(10, 60_000)
 
   async function toStatus(issue: Issue): Promise<RequestStatus | null> {
     const regionId = issue.title.match(REGION_PREFIX)?.[1]
@@ -115,7 +141,7 @@ export function createStatusHandler(gh: Gh): Connect.NextHandleFunction {
       assigned: issue.assignees.length > 0,
     }
     if (state === 'declined') {
-      const comment = await latestComment(issue.number).catch(() => undefined)
+      const comment = await latestComment.get(issue.number)
       if (comment) status.comment = comment
     }
     return status
@@ -128,27 +154,29 @@ export function createStatusHandler(gh: Gh): Connect.NextHandleFunction {
       res.setHeader('allow', 'GET')
       return send(res, 405, { error: 'method not allowed' })
     }
+    const listed = await listIssues()
+    const known = new Set(listed.map((issue) => issue.number))
     const ids = parseIds(req.url)
-    try {
-      const listed = await listIssues()
-      const known = new Set(listed.map((issue) => issue.number))
-      const extra = await Promise.all(
-        ids.filter((n) => !known.has(n)).map(viewIssue),
-      )
-      const candidates = [
-        ...listed.filter((i) => onBoard(i) || ids.includes(i.number)),
-        ...extra.filter((i) => i !== null),
-      ]
-      const requests = (await Promise.all(candidates.map(toStatus))).filter(
-        (s) => s !== null,
-      )
-      const shipped = listed
-        .filter((i) => labelsOf(i).includes('shipped'))
-        .map((i) => i.number)
-      send(res, 200, { requests, shipped })
-    } catch (error) {
-      send(res, 502, { error: (error as Error).message })
-    }
+    const wanted = ids.filter((n) => !known.has(n))
+    // Only a call that needs gh for its ids counts against the client; over
+    // the limit its ids come from cache or not at all, and the board still loads.
+    const mayFetch =
+      wanted.every(viewIssue.isFresh) ||
+      !overLimit(clientKey(req.headers, req.socket.remoteAddress))
+    const extra = await Promise.all(
+      wanted.map((n) => viewIssue.get(n, mayFetch)),
+    )
+    const candidates = [
+      ...listed.filter((i) => onBoard(i) || ids.includes(i.number)),
+      ...extra.filter((i) => i != null),
+    ]
+    const requests = (await Promise.all(candidates.map(toStatus))).filter(
+      (s) => s !== null,
+    )
+    const shipped = listed
+      .filter((i) => labelsOf(i).includes('shipped'))
+      .map((i) => i.number)
+    send(res, 200, { requests, shipped })
   }
 }
 

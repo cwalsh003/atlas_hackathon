@@ -30,8 +30,9 @@ function EditableRegion({
   const { enabled, isPhone, targeted } = useEditMode()
   const [open, setOpen] = useState(false)
   const Tag = as
-  const issue = targeted[id]
-  const request = useRegionRequest(id, issue)
+  const target = targeted[id]
+  const issue = target?.issue
+  const request = useRegionRequest(id, target)
   const showPen = enabled && !isPhone
 
   // On phones the whole region is the tap target. Ignore events from demo-only

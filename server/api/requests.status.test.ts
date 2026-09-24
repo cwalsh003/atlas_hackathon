@@ -77,17 +77,29 @@ function makeRes() {
 async function get(
   handler: ReturnType<typeof createStatusHandler>,
   url = '/',
-  method = 'GET',
+  { method = 'GET', client = '198.51.100.1' } = {},
 ) {
   const res = makeRes()
   const next = vi.fn()
+  const req = {
+    method,
+    url,
+    headers: { 'cf-connecting-ip': client },
+    socket: { remoteAddress: '127.0.0.1' },
+  }
   // @ts-expect-error - fake req/res are enough for this handler
-  await handler({ method, url }, res, next)
+  await handler(req, res, next)
   return { res, next, json: res.body ? JSON.parse(res.body) : undefined }
 }
 
 const listCalls = (gh: ReturnType<typeof fakeGh>) =>
   gh.mock.calls.filter(([args]) => args[1] === 'list')
+
+const viewsOf = (gh: ReturnType<typeof fakeGh>, n: number) =>
+  gh.mock.calls.filter(
+    ([args]) =>
+      args[1] === 'view' && args[2] === String(n) && args.at(-1) !== 'comments',
+  )
 
 describe('GET /api/requests/status', () => {
   beforeEach(() => vi.stubEnv('VITE_DEMO_MODE', '1'))
@@ -182,17 +194,76 @@ describe('GET /api/requests/status', () => {
     expect(viewsOf30).toHaveLength(1)
   })
 
-  it('answers 502 when gh fails', async () => {
-    const { res } = await get(
-      createStatusHandler(async () => {
-        throw new Error('HTTP 401: Bad credentials')
-      }),
-    )
-    expect(res.statusCode).toBe(502)
+  it('serves the last good board when gh list fails and retries only after five seconds', async () => {
+    vi.useFakeTimers()
+    let failing = true
+    const gh: ReturnType<typeof fakeGh> = vi.fn(async (args: string[]) => {
+      if (failing) throw new Error('HTTP 401: Bad credentials')
+      return args[1] === 'list' ? JSON.stringify(board) : '{}'
+    })
+    const handler = createStatusHandler(gh)
+
+    const first = await get(handler)
+    await get(handler)
+    expect(first.res.statusCode).toBe(200)
+    expect(first.json).toEqual({ requests: [], shipped: [] })
+    expect(listCalls(gh)).toHaveLength(1)
+
+    failing = false
+    vi.advanceTimersByTime(5001)
+    expect((await get(handler)).json.requests).toHaveLength(4)
+
+    failing = true
+    vi.advanceTimersByTime(5001)
+    expect((await get(handler)).json.requests).toHaveLength(4)
+    expect(listCalls(gh)).toHaveLength(3)
+    vi.useRealTimers()
+  })
+
+  it('stops looking up new ids for a client over 10 lookups a minute, still serving the board and ids it already has', async () => {
+    const gh = fakeGh()
+    const handler = createStatusHandler(gh)
+    const client = '203.0.113.9'
+
+    await get(handler, '/?ids=30', { client })
+    for (let n = 40; n < 49; n++) await get(handler, `/?ids=${n}`, { client })
+    const { json } = await get(handler, '/?ids=30,60', { client })
+
+    expect(viewsOf(gh, 60)).toHaveLength(0)
+    expect(json.requests.map((r: { number: number }) => r.number)).toEqual([
+      20, 21, 22, 26, 30,
+    ])
+
+    await get(handler, '/?ids=60', { client: '203.0.113.10' })
+    expect(viewsOf(gh, 60)).toHaveLength(1)
+  })
+
+  it('ignores ids above 100000', async () => {
+    const gh = fakeGh()
+    await get(createStatusHandler(gh), '/?ids=100001,30')
+    expect(viewsOf(gh, 100001)).toHaveLength(0)
+    expect(viewsOf(gh, 30)).toHaveLength(1)
+  })
+
+  it('forgets every cached id lookup once more than 500 are held', async () => {
+    const gh = fakeGh()
+    const handler = createStatusHandler(gh)
+    const ids = Array.from({ length: 501 }, (_, i) => 1000 + i)
+    for (let i = 0; i < ids.length; i += 20) {
+      const batch = ids.slice(i, i + 20).join(',')
+      await get(handler, `/?ids=${batch}`, { client: `192.0.2.${i / 20}` })
+    }
+    await get(handler, '/?ids=1001,1500', { client: '192.0.2.200' })
+
+    // 1001 was dropped when the 501st id arrived; 1500 is still cached.
+    expect(viewsOf(gh, 1001)).toHaveLength(2)
+    expect(viewsOf(gh, 1500)).toHaveLength(1)
   })
 
   it('refuses anything but GET', async () => {
-    const { res } = await get(createStatusHandler(fakeGh()), '/', 'POST')
+    const { res } = await get(createStatusHandler(fakeGh()), '/', {
+      method: 'POST',
+    })
     expect(res.statusCode).toBe(405)
     expect(res.headers.allow).toBe('GET')
   })

@@ -1,0 +1,8 @@
+# AC6: requests the viewer submitted in this browser are remembered across reloads so their pills reappear
+# The request is off the board on purpose: a vote-lane issue has no lane:implement label, so the board list never returns it and its pill can only come from the remembered id (ids= on /api/requests/status).
+# Playwright 1.63 Chromium, dev server on http://localhost:5176. Screenshot: after-reload.png (browser C after reload).
+filed vote-lane scratch issue #34 on region roster from browser C through the request modal (Put it to a vote, scratch: true injected into the POST)
+after reload: pill "queued" href=https://github.com/cwalsh003/atlas_hackathon/issues/34 after 0.8 s
+browser C localStorage asd.myRequests = [34]
+browser C edit mode after reload: aria-pressed=false
+control: fresh browser D (empty localStorage), roster pills after 12 s: 0

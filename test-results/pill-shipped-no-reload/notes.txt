@@ -1,8 +1,11 @@
 # AC5: labelling the scratch issue shipped shows the flagged change within ten seconds without a page reload
-# Temporary, uncommitted wrapper in src/dashboard/Footer.tsx: const on = useFlag('req-24'); footer text is "Built by Jahnel Group. Shipped by Atlas (#24)." when on, else "Built by Jahnel Group". Restored with git checkout before commit.
+# Temporary, uncommitted wrapper in src/dashboard/Footer.tsx: const on = useFlag('req-31'); footer text is "Built by Jahnel Group. Shipped by Atlas (#31)." when on, else "Built by Jahnel Group". Restored with git checkout before commit.
+# Status poll is the only feed: page.route('**/api/flags', r => r.abort()) was installed before the page loaded, and flagStore stands down once the status store marks itself the external feed.
 # One Playwright page (1280x900) loaded once; window.__marker set right after load, before any label change; the page was never reloaded or navigated.
-before: footer "Built by Jahnel Group", window.__marker=1790257103449, navigation entries=1, performance.timeOrigin=1790257103230.4
-$ gh issue edit 24 --add-label shipped   (returned at 2026-09-24T13:39:26.331Z)
-after:  footer "Built by Jahnel Group. Shipped by Atlas (#24)." at 2026-09-24T13:39:34.538Z, window.__marker=1790257103449, navigation entries=1, performance.timeOrigin=1790257103230.4
-Seconds from the label landing to the change on screen: 8.2
+before: footer "Built by Jahnel Group", window.__marker=1790258028070, navigation entries=1, performance.timeOrigin=1790258027848.9
+$ gh issue edit 31 --add-label shipped   (returned at 2026-09-24T13:54:50.915Z)
+after:  footer "Built by Jahnel Group. Shipped by Atlas (#31)." at 2026-09-24T13:54:59.014Z, window.__marker=1790258028070, navigation entries=1, performance.timeOrigin=1790258027848.9
+Seconds from the label landing to the change on screen: 8.1
 Same document (marker and timeOrigin unchanged): true
+/api/flags requests aborted during the whole run: 0
+# 0 aborted means the page never requested /api/flags at all: the status store marked itself the external feed before the flag store's first poll, so the footer change above came from /api/requests/status alone.
