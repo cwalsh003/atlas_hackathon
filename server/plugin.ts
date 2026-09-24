@@ -4,28 +4,17 @@ import type { Connect, Plugin } from 'vite'
 
 const API_DIR = 'server/api'
 
-/**
- * Maps `server/api/` filenames to routes: a dot becomes a path segment, so
- * `requests.status.ts` mounts at `/api/requests/status`. Longest path first,
- * because a Connect prefix route would otherwise swallow its sub-routes.
- */
-export function apiRoutes(entries: string[]): [route: string, entry: string][] {
-  return entries
-    .filter((entry) => entry.endsWith('.ts') && !entry.endsWith('.test.ts'))
-    .map((entry): [string, string] => [
-      `/api/${entry.replace(/\.ts$/, '').replaceAll('.', '/')}`,
-      entry,
-    ])
-    .sort(([a], [b]) => b.length - a.length)
-}
-
 export function apiPlugin(): Plugin {
   return {
     name: 'atlas-api-plugin',
     async configureServer(server) {
       const apiDir = path.resolve(server.config.root, API_DIR)
+      const entries = await readdir(apiDir)
 
-      for (const [route, entry] of apiRoutes(await readdir(apiDir))) {
+      for (const entry of entries) {
+        if (!entry.endsWith('.ts') || entry.endsWith('.test.ts')) continue
+
+        const basename = entry.replace(/\.ts$/, '')
         const file = path.join(apiDir, entry)
 
         const handler: Connect.NextHandleFunction = async (req, res, next) => {
@@ -37,7 +26,7 @@ export function apiPlugin(): Plugin {
           }
         }
 
-        server.middlewares.use(route, handler)
+        server.middlewares.use(`/api/${basename}`, handler)
       }
     },
   }

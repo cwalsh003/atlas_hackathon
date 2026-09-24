@@ -1,0 +1,49 @@
+# AC4: served checkout sampled every 30 s: date | git status --short | wc -l | git branch --show-current
+2026-09-24T10:22:56 | status_lines=0 | branch=main
+2026-09-24T10:23:26 | status_lines=0 | branch=main
+2026-09-24T10:23:56 | status_lines=0 | branch=main
+2026-09-24T10:24:26 | status_lines=0 | branch=main
+2026-09-24T10:24:56 | status_lines=0 | branch=main
+2026-09-24T10:25:26 | status_lines=0 | branch=main
+2026-09-24T10:25:57 | status_lines=0 | branch=main
+2026-09-24T10:26:27 | status_lines=0 | branch=main
+2026-09-24T10:26:57 | status_lines=0 | branch=main
+2026-09-24T10:27:27 | status_lines=0 | branch=main
+2026-09-24T10:27:57 | status_lines=0 | branch=main
+2026-09-24T10:28:27 | status_lines=0 | branch=main
+2026-09-24T10:28:57 | status_lines=0 | branch=main
+2026-09-24T10:29:27 | status_lines=0 | branch=main
+2026-09-24T10:29:58 | status_lines=0 | branch=main
+2026-09-24T10:30:28 | status_lines=0 | branch=main
+2026-09-24T10:30:58 | status_lines=0 | branch=main
+2026-09-24T10:31:28 | status_lines=0 | branch=main
+2026-09-24T10:32:09 | status_lines=0 | branch=main | (final check after the loop stopped)
+# AC4 run 2 (review-fix rerun): served checkout sampled every 30 s: date | git status --short | wc -l | git branch --show-current
+2026-09-24T10:47:59 | status_lines=0 | branch=main
+2026-09-24T10:48:29 | status_lines=0 | branch=main
+2026-09-24T10:49:00 | status_lines=0 | branch=main
+2026-09-24T10:49:30 | status_lines=0 | branch=main
+2026-09-24T10:50:00 | status_lines=0 | branch=main
+2026-09-24T10:50:30 | status_lines=0 | branch=main
+2026-09-24T10:51:00 | status_lines=0 | branch=main
+2026-09-24T10:51:30 | status_lines=0 | branch=main
+2026-09-24T10:52:00 | status_lines=0 | branch=main
+2026-09-24T10:52:30 | status_lines=0 | branch=main
+2026-09-24T10:53:01 | status_lines=0 | branch=main
+2026-09-24T10:53:31 | status_lines=0 | branch=main
+2026-09-24T10:54:01 | status_lines=0 | branch=main
+2026-09-24T10:54:31 | status_lines=0 | branch=main
+2026-09-24T10:55:01 | status_lines=0 | branch=main
+2026-09-24T10:55:31 | status_lines=0 | branch=main
+2026-09-24T10:56:01 | status_lines=0 | branch=main
+2026-09-24T10:56:32 | status_lines=0 | branch=main
+2026-09-24T10:57:02 | status_lines=0 | branch=main
+2026-09-24T10:57:32 | status_lines=0 | branch=main
+2026-09-24T10:58:02 | status_lines=0 | branch=main
+2026-09-24T10:58:32 | status_lines=0 | branch=main
+2026-09-24T10:59:02 | status_lines=0 | branch=main
+2026-09-24T10:59:32 | status_lines=0 | branch=main
+2026-09-24T11:00:02 | status_lines=0 | branch=main
+2026-09-24T11:00:33 | status_lines=0 | branch=main
+2026-09-24T11:01:03 | status_lines=0 | branch=main
+2026-09-24T11:01:24 | status_lines=0 | branch=main | (final check after the loop stopped)

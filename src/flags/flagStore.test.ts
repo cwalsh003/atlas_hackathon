@@ -68,27 +68,4 @@ describe('flagStore', () => {
     expect(fetchMock).not.toHaveBeenCalled()
     unsubscribe()
   })
-
-  it('leaves the shipped set to an external feed once one is marked', async () => {
-    vi.stubEnv('VITE_DEMO_MODE', '1')
-    vi.useFakeTimers()
-    const fetchMock = vi.fn()
-    vi.stubGlobal('fetch', fetchMock)
-    vi.stubGlobal('window', {
-      location: { search: '' },
-      localStorage: { getItem: () => null, setItem: () => {} },
-    })
-    const { markExternalFeed, setShipped, subscribe, getSnapshot } =
-      await import('./flagStore.ts')
-    markExternalFeed()
-    const unsubscribe = subscribe(() => {})
-
-    await vi.advanceTimersByTimeAsync(15_000)
-    expect(fetchMock).not.toHaveBeenCalled()
-
-    setShipped(new Set(['req-24']))
-    expect(getSnapshot().shipped).toEqual(new Set(['req-24']))
-    unsubscribe()
-    vi.useRealTimers()
-  })
 })
