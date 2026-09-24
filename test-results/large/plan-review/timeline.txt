@@ -118,3 +118,5 @@ The 'waiting for approval' pill screenshot was not possible: the #48 squash (ee6
 
 ## Status endpoint for #49 after approval (2026-09-24T19:09:26Z), labels: needs-triage,ready-for-agent,in-progress,lane:implement,size:large
 {"number":49,"regionId":"orders","state":"building","url":"https://github.com/cwalsh003/atlas_hackathon/issues/49","assigned":true}
+
+Note: the plan output file was renamed from loop-req-<n>-plan.json to loop-req-<n>-plan.log (git-ignored) before the commit; the log line above shows the old name.

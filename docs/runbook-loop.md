@@ -123,7 +123,7 @@ Your moves, exactly:
 
    The loop notices within one cycle and starts implementing. Adding `in-progress` is the approval signal; removing `plan-review` alone does nothing.
 
-3. Or reject it. Comment why (your comment, from the loop's account, is trusted by the next planner), then decline the request or send it back for a new plan:
+3. Or reject it. Comment why (your comment, from the loop's account, is honoured by the next planner as human feedback), then decline the request or send it back for a new plan:
 
    ```bash
    gh issue comment <n> --body "<why>"
@@ -157,6 +157,8 @@ Measured on 2026-09-24 with `LOOP_INTERVAL=20` and `IMPLEMENT_MODE=atlas` (raw n
 | `shipped` to change visible, no reload          | 6 s                                     |
 
 Plan on about 6 minutes from filing to `plan-review` and about 7 minutes from your approval to the PR, plus your own review time at both gates. While #49 waited at `plan-review`, a declined request (#50) got its `[TRIAGE]` comment 13 s after filing and a small request (#51) shipped 368 s after filing.
+
+When a rejection ends in `wontfix` or `needs-info`, also remove the request's worktree: `git worktree remove .claude/worktrees/req-<n>/atlas_hackathon` (a re-plan reuses it otherwise).
 
 ## Declined
 
