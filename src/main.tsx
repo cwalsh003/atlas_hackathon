@@ -7,6 +7,7 @@ import App from './App.tsx'
 // folds it before resolving the import; via isDemoMode an orphan edit-*.css
 // was still emitted into dist/assets.
 if (import.meta.env.VITE_DEMO_MODE === '1') void import('./edit/edit.css')
+if (import.meta.env.VITE_DEMO_MODE === '1') void import('./vote/vote.css')
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
