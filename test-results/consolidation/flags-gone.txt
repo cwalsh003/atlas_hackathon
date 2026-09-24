@@ -1,0 +1,8 @@
+# Consolidation (#9): keep #49, drop #42 #44 #45 #51
+$ grep -rnE "req-(42|44|45|49|51)" src   # expect: nothing (example ids in src/flags renamed to req-100)
+exit=1
+$ npm run build; grep -c Crew dist/assets/*.js   # kept change in the production bundle, no override, no shipped set
+1
+$ grep -c -e "Snowed in" -e Cleared -e "Out plowing" -e "❄" dist/assets/*.js   # dropped changes gone
+0
+exit=1

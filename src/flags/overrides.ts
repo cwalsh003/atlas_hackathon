@@ -1,6 +1,6 @@
 // Viewer-local flag overrides. Demo-only because flagStore reaches this module
-// only inside its `isDemoMode` branch. A `?flag=req-42` query param turns a
-// flag on for this viewer; `?unflag=req-42` turns it off. Both persist to
+// only inside its `isDemoMode` branch. A `?flag=req-100` query param turns a
+// flag on for this viewer; `?unflag=req-100` turns it off. Both persist to
 // localStorage so the choice survives a reload.
 
 const STORAGE_KEY = 'asd.flagOverrides'

@@ -14,10 +14,10 @@ describe('flagStore', () => {
     const listener = vi.fn()
     const unsubscribe = subscribe(listener)
 
-    setShipped(new Set(['req-42']))
+    setShipped(new Set(['req-100']))
 
     expect(listener).toHaveBeenCalled()
-    expect(getSnapshot().shipped).toEqual(new Set(['req-42']))
+    expect(getSnapshot().shipped).toEqual(new Set(['req-100']))
     unsubscribe()
   })
 

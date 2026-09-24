@@ -1,6 +1,6 @@
 /**
  * Whether the change wrapped by a flag should render for this viewer.
- * A flag id such as `req-42` is on when its request is shipped (the issue
+ * A flag id such as `req-100` is on when its request is shipped (the issue
  * carries the `shipped` label) or the viewer has a local override
  * for it, and only ever in demo mode. Outside demo mode this is always false.
  */
