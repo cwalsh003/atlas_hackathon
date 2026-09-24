@@ -1,0 +1,24 @@
+# AC2: GET /api/requests/status (optional ids=...) returns state, region id, and issue URL for every request issue plus any requested ids;
+#      two calls within 5 s with different id lists make one gh list call
+# Dev server: npm run dev:demo -- --port 5176 --strictPort, started with a logging shim first on PATH that appends
+# every gh invocation the dev server makes to gh-calls.log and then execs the real gh.
+# On the board: scratch issue #24 (open, lane:implement, needs-triage, title 'kpi-orders: ...').
+# ids=5: issue 5 is not lane:implement, so it is fetched individually; its title has no '<region id>:' prefix, so it is dropped.
+# ids=19: closed scratch smoke issue (lane:implement, not shipped), known from the list, so no extra gh call and no pill.
+# ids=20: a pull request number; gh issue view fails and it is ignored.
+
+$ curl -s 'http://localhost:5176/api/requests/status?ids=5'    # at 09:36:12
+{"requests":[{"number":24,"regionId":"kpi-orders","state":"queued","url":"https://github.com/cwalsh003/atlas_hackathon/issues/24","assigned":false}],"shipped":[]}
+HTTP 200
+
+$ curl -s 'http://localhost:5176/api/requests/status?ids=19,20'    # at 09:36:13
+{"requests":[{"number":24,"regionId":"kpi-orders","state":"queued","url":"https://github.com/cwalsh003/atlas_hackathon/issues/24","assigned":false}],"shipped":[]}
+HTTP 200
+
+$ cat gh-calls.log   # every gh call the dev server made during the two curls
+09:36:12 gh issue list --state all --label lane:implement --limit 200 --json number,title,labels,assignees,state,url
+09:36:13 gh issue view 5 --json number,title,labels,assignees,state,url
+09:36:13 gh issue view 20 --json number,title,labels,assignees,state,url
+
+$ grep -c 'issue list --state all --label lane:implement' gh-calls.log
+1

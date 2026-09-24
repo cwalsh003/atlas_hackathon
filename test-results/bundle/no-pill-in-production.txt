@@ -1,0 +1,12 @@
+# AC7 / demo-only rule: production build (no VITE_DEMO_MODE) contains no status pill code
+# npm run build; grep -c <string> dist/assets/*.js dist/assets/*.css (count of matching lines per file, expect 0)
+dist/assets/index-DAgvJCvM.js
+dist/assets/index-DSq0eAs6.css
+pill                  index-DAgvJCvM.js:0 index-DSq0eAs6.css:0 
+pill--                index-DAgvJCvM.js:0 index-DSq0eAs6.css:0 
+region--pill          index-DAgvJCvM.js:0 index-DSq0eAs6.css:0 
+region-controls       index-DAgvJCvM.js:0 index-DSq0eAs6.css:0 
+/api/requests/status  index-DAgvJCvM.js:0 index-DSq0eAs6.css:0 
+asd.myRequests        index-DAgvJCvM.js:0 index-DSq0eAs6.css:0 
+waiting for approval  index-DAgvJCvM.js:0 index-DSq0eAs6.css:0 
+PR open               index-DAgvJCvM.js:0 index-DSq0eAs6.css:0 

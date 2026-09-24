@@ -5,6 +5,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from 'react'
+import { rememberRequest } from '../status/myRequests'
 
 type EditMode = {
   enabled: boolean
@@ -41,8 +42,10 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
         toggle: () => setEnabled((on) => !on),
         isPhone,
         targeted,
-        markTargeted: (regionId, issueNumber) =>
-          setTargeted((prev) => ({ ...prev, [regionId]: issueNumber })),
+        markTargeted: (regionId, issueNumber) => {
+          rememberRequest(issueNumber)
+          setTargeted((prev) => ({ ...prev, [regionId]: issueNumber }))
+        },
       }}
     >
       {children}
