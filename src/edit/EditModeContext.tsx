@@ -5,12 +5,14 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from 'react'
+import { rememberRequest } from '../status/myRequests'
+import { getPollCount, type TargetedRequest } from '../status/statusStore'
 
 type EditMode = {
   enabled: boolean
   toggle: () => void
   isPhone: boolean
-  targeted: Record<string, number>
+  targeted: Record<string, TargetedRequest>
   markTargeted: (regionId: string, issueNumber: number) => void
 }
 
@@ -27,7 +29,7 @@ function subscribeToPhone(onChange: () => void) {
 
 export function EditModeProvider({ children }: { children: ReactNode }) {
   const [enabled, setEnabled] = useState(false)
-  const [targeted, setTargeted] = useState<Record<string, number>>({})
+  const [targeted, setTargeted] = useState<Record<string, TargetedRequest>>({})
   const isPhone = useSyncExternalStore(
     subscribeToPhone,
     () => window.matchMedia(PHONE_QUERY).matches,
@@ -41,8 +43,13 @@ export function EditModeProvider({ children }: { children: ReactNode }) {
         toggle: () => setEnabled((on) => !on),
         isPhone,
         targeted,
-        markTargeted: (regionId, issueNumber) =>
-          setTargeted((prev) => ({ ...prev, [regionId]: issueNumber })),
+        markTargeted: (regionId, issueNumber) => {
+          rememberRequest(issueNumber)
+          setTargeted((prev) => ({
+            ...prev,
+            [regionId]: { issue: issueNumber, pollCount: getPollCount() },
+          }))
+        },
       }}
     >
       {children}
